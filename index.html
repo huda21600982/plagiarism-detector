@@ -14,17 +14,27 @@
     <div id="result" class="mt-4 text-gray-700"></div>
   </div>
 
-  <script>
-    async function checkPlagiarism() {
-      const text = document.getElementById("inputText").value;
-      document.getElementById("result").innerText = "Checking...";
+ <script>
+  async function checkPlagiarism() {
+    const text = document.getElementById("inputText").value;
+    document.getElementById("result").innerText = "Checking...";
 
-      // For now, just simulate response
-      // Later, this will call your backend AI API
-      setTimeout(() => {
-        document.getElementById("result").innerText = "No plagiarism detected ✅";
-      }, 2000);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await response.json();
+      document.getElementById("result").innerText =
+        `Score: ${data.plagiarism_score}% - ${data.message}`;
+    } catch (error) {
+      document.getElementById("result").innerText =
+        "❌ Error: Could not connect to backend.";
     }
-  </script>
+  }
+</script>
 </body>
 </html>
+
