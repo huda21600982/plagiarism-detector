@@ -6,35 +6,54 @@
   <title>AI Plagiarism Detector</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-lg">
-    <h1 class="text-2xl font-bold mb-4 text-center">AI Plagiarism Detector</h1>
-    <textarea id="inputText" class="w-full h-40 p-3 border rounded-lg mb-4" placeholder="Paste your text here..."></textarea>
-    <button onclick="checkPlagiarism()" class="bg-blue-500 text-white px-4 py-2 rounded-lg w-full">Check Plagiarism</button>
-    <div id="result" class="mt-4 text-gray-700"></div>
+<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
+    <!-- Title -->
+    <h1 class="text-3xl font-extrabold text-gray-800 text-center mb-6">
+      🔎 AI Plagiarism Detector
+    </h1>
+
+    <!-- Input -->
+    <label for="inputText" class="block mb-2 font-semibold text-gray-700">
+      Paste your text here:
+    </label>
+    <textarea id="inputText" class="w-full h-48 p-4 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none mb-6 resize-none" placeholder="Type or paste text to check..."></textarea>
+
+    <!-- Button -->
+    <button onclick="checkPlagiarism()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">
+      Check Plagiarism
+    </button>
+
+    <!-- Result Box -->
+    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 text-gray-800 text-center font-medium shadow-inner">
+      Result will appear here...
+    </div>
   </div>
 
- <script>
-  async function checkPlagiarism() {
-    const text = document.getElementById("inputText").value;
-    document.getElementById("result").innerText = "Checking...";
+  <!-- Script -->
+  <script>
+    async function checkPlagiarism() {
+      const text = document.getElementById("inputText").value;
+      document.getElementById("result").innerText = "⏳ Checking for plagiarism...";
 
-    try {
-      const response = await fetch("http://127.0.0.1:5000/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
-      });
+      try {
+        const response = await fetch("http://127.0.0.1:5000/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
 
-      const data = await response.json();
-      document.getElementById("result").innerText =
-        `Score: ${data.plagiarism_score}% - ${data.message}`;
-    } catch (error) {
-      document.getElementById("result").innerText =
-        "❌ Error: Could not connect to backend.";
+        const data = await response.json();
+        document.getElementById("result").innerText =
+          `Score: ${data.plagiarism_score}% → ${data.message}`;
+      } catch (error) {
+        document.getElementById("result").innerText =
+          "❌ Error: Could not connect to backend.";
+      }
     }
-  }
-</script>
+  </script>
 </body>
 </html>
+
+
 
