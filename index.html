@@ -1,34 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Plagiarism Detector</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-6">
-  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
-    <!-- Title -->
-    <h1 class="text-3xl font-extrabold text-gray-800 text-center mb-6">
-      🔎 AI Plagiarism Detector
-    </h1>
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- Input -->
-    <label for="inputText" class="block mb-2 font-semibold text-gray-700">
-      Paste your text here:
-    </label>
-    <textarea id="inputText" class="w-full h-48 p-4 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none mb-6 resize-none" placeholder="Type or paste text to check..."></textarea>
-
-    <!-- Button -->
-    <button onclick="checkPlagiarism()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">
-      Check Plagiarism
-    </button>
-
-    <!-- Result Box -->
-    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 text-gray-800 text-center font-medium shadow-inner">
-      Result will appear here...
+  <!-- Navbar -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <h1 class="text-2xl font-bold text-indigo-600">AI Plagiarism Detector</h1>
+      <nav class="space-x-6 hidden md:block">
+        <a href="#tool" class="hover:text-indigo-600">Tool</a>
+        <a href="#features" class="hover:text-indigo-600">Features</a>
+        <a href="#how" class="hover:text-indigo-600">How It Works</a>
+        <a href="#about" class="hover:text-indigo-600">About</a>
+      </nav>
     </div>
-  </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
+    <div class="container mx-auto text-center px-6">
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Detect Plagiarism Instantly with AI</h2>
+      <p class="text-lg md:text-xl mb-6">Paste your text below and let our AI-powered tool check for originality.</p>
+      <a href="#tool" class="bg-white text-indigo-600 px-6 py-3 rounded-full font-semibold shadow-md hover:bg-gray-100 transition">Try It Now</a>
+    </div>
+  </section>
+
+  <!-- Main Tool Section -->
+  <section id="tool" class="py-16 bg-gray-100">
+    <div class="container mx-auto max-w-3xl bg-white p-8 rounded-2xl shadow-lg">
+      <h3 class="text-2xl font-bold text-center mb-6">Check Your Text</h3>
+      <textarea id="inputText" class="w-full h-48 p-4 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none mb-6 resize-none" placeholder="Paste your text here..."></textarea>
+      <button onclick="checkPlagiarism()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">Check Plagiarism</button>
+      <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 text-gray-800 text-center font-medium shadow-inner">
+        Result will appear here...
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20">
+    <div class="container mx-auto text-center px-6">
+      <h3 class="text-3xl font-bold mb-10">Why Use Our Tool?</h3>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="text-xl font-semibold mb-2">⚡ Fast & Accurate</h4>
+          <p>Get results instantly with AI-powered plagiarism detection.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="text-xl font-semibold mb-2">🔒 Secure</h4>
+          <p>Your text is processed safely without storing personal data.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="text-xl font-semibold mb-2">💡 Easy to Use</h4>
+          <p>Simple interface designed for students, teachers, and professionals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how" class="py-20 bg-gray-100">
+    <div class="container mx-auto text-center px-6">
+      <h3 class="text-3xl font-bold mb-10">How It Works</h3>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="font-semibold mb-2">Step 1</h4>
+          <p>Paste your text into the box.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="font-semibold mb-2">Step 2</h4>
+          <p>Our AI checks similarity with stored sources.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-md">
+          <h4 class="font-semibold mb-2">Step 3</h4>
+          <p>View your plagiarism score instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-20">
+    <div class="container mx-auto text-center px-6 max-w-2xl">
+      <h3 class="text-3xl font-bold mb-6">About This Tool</h3>
+      <p class="text-lg text-gray-700">
+        This AI-powered plagiarism detector was built to help students, educators, and content creators ensure originality in their writing.
+        Our mission is to make plagiarism detection accessible, fast, and reliable.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-indigo-600 text-white py-6 mt-10">
+    <div class="container mx-auto text-center">
+      <p>© 2025 AI Plagiarism Detector | Built with ❤️ by You</p>
+      <p class="mt-2">
+        <a href="https://github.com/YOUR-USERNAME" target="_blank" class="underline hover:text-gray-200">GitHub</a>
+      </p>
+    </div>
+  </footer>
 
   <!-- Script -->
   <script>
@@ -54,6 +129,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
