@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="transition-colors duration-500">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Plagiarism Detector</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Enable Tailwind's dark mode with class strategy
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
   <!-- Navbar -->
-  <header class="bg-white shadow-md sticky top-0 z-50">
+  <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
-      <h1 class="text-2xl font-bold text-indigo-600">AI Plagiarism Detector</h1>
-      <nav class="space-x-6 hidden md:block">
-        <a href="#tool" class="hover:text-indigo-600">Tool</a>
-        <a href="#features" class="hover:text-indigo-600">Features</a>
-        <a href="#how" class="hover:text-indigo-600">How It Works</a>
-        <a href="#about" class="hover:text-indigo-600">About</a>
-      </nav>
+      <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">AI Plagiarism Detector</h1>
+      <div class="flex items-center space-x-6">
+        <nav class="hidden md:flex space-x-6">
+          <a href="#tool" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tool</a>
+          <a href="#features" class="hover:text-indigo-600 dark:hover:text-indigo-400">Features</a>
+          <a href="#how" class="hover:text-indigo-600 dark:hover:text-indigo-400">How It Works</a>
+          <a href="#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+        </nav>
+        <!-- Fancy Dark Mode Toggle -->
+        <button id="darkToggle" 
+          class="w-16 h-8 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-1 transition duration-300 relative">
+          <span class="absolute left-2 text-yellow-500 text-sm">☀️</span>
+          <span class="absolute right-2 text-gray-200 text-sm">🌙</span>
+          <div id="toggleCircle" 
+            class="bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300">
+          </div>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -31,12 +48,12 @@
   </section>
 
   <!-- Main Tool Section -->
-  <section id="tool" class="py-16 bg-gray-100">
-    <div class="container mx-auto max-w-3xl bg-white p-8 rounded-2xl shadow-lg">
+  <section id="tool" class="py-16 bg-gray-100 dark:bg-gray-800">
+    <div class="container mx-auto max-w-3xl bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg">
       <h3 class="text-2xl font-bold text-center mb-6">Check Your Text</h3>
-      <textarea id="inputText" class="w-full h-48 p-4 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none mb-6 resize-none" placeholder="Paste your text here..."></textarea>
+      <textarea id="inputText" class="w-full h-48 p-4 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none mb-6 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" placeholder="Paste your text here..."></textarea>
       <button onclick="checkPlagiarism()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">Check Plagiarism</button>
-      <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 text-gray-800 text-center font-medium shadow-inner">
+      <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center font-medium shadow-inner">
         Result will appear here...
       </div>
     </div>
@@ -47,15 +64,15 @@
     <div class="container mx-auto text-center px-6">
       <h3 class="text-3xl font-bold mb-10">Why Use Our Tool?</h3>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="text-xl font-semibold mb-2">⚡ Fast & Accurate</h4>
           <p>Get results instantly with AI-powered plagiarism detection.</p>
         </div>
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="text-xl font-semibold mb-2">🔒 Secure</h4>
           <p>Your text is processed safely without storing personal data.</p>
         </div>
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="text-xl font-semibold mb-2">💡 Easy to Use</h4>
           <p>Simple interface designed for students, teachers, and professionals.</p>
         </div>
@@ -64,19 +81,19 @@
   </section>
 
   <!-- How It Works -->
-  <section id="how" class="py-20 bg-gray-100">
+  <section id="how" class="py-20 bg-gray-100 dark:bg-gray-900">
     <div class="container mx-auto text-center px-6">
       <h3 class="text-3xl font-bold mb-10">How It Works</h3>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="font-semibold mb-2">Step 1</h4>
           <p>Paste your text into the box.</p>
         </div>
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="font-semibold mb-2">Step 2</h4>
           <p>Our AI checks similarity with stored sources.</p>
         </div>
-        <div class="p-6 bg-white rounded-xl shadow-md">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
           <h4 class="font-semibold mb-2">Step 3</h4>
           <p>View your plagiarism score instantly.</p>
         </div>
@@ -88,7 +105,7 @@
   <section id="about" class="py-20">
     <div class="container mx-auto text-center px-6 max-w-2xl">
       <h3 class="text-3xl font-bold mb-6">About This Tool</h3>
-      <p class="text-lg text-gray-700">
+      <p class="text-lg text-gray-700 dark:text-gray-300">
         This AI-powered plagiarism detector was built to help students, educators, and content creators ensure originality in their writing.
         Our mission is to make plagiarism detection accessible, fast, and reliable.
       </p>
@@ -107,6 +124,29 @@
 
   <!-- Script -->
   <script>
+    // Dark Mode Toggle
+    const toggleBtn = document.getElementById('darkToggle');
+    const toggleCircle = document.getElementById('toggleCircle');
+    const htmlEl = document.documentElement;
+
+    // Load saved preference
+    if (localStorage.getItem('theme') === 'dark') {
+      htmlEl.classList.add('dark');
+      toggleCircle.classList.add('translate-x-8');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      htmlEl.classList.toggle('dark');
+      if (htmlEl.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+        toggleCircle.classList.add('translate-x-8');
+      } else {
+        localStorage.setItem('theme', 'light');
+        toggleCircle.classList.remove('translate-x-8');
+      }
+    });
+
+    // Plagiarism check (dummy for now)
     async function checkPlagiarism() {
       const text = document.getElementById("inputText").value;
       document.getElementById("result").innerText = "⏳ Checking for plagiarism...";
@@ -129,6 +169,7 @@
   </script>
 </body>
 </html>
+
 
 
 
