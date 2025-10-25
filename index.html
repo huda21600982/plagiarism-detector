@@ -19,11 +19,20 @@
 
   <!-- Main -->
   <main class="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-    <h2 class="text-xl font-semibold mb-4">Check for Plagiarism</h2>
+    <h2 class="text-xl font-semibold mb-6 text-center">Check for Plagiarism</h2>
+
+    <!-- Text Input -->
     <textarea id="inputText" rows="6" class="w-full p-3 rounded-lg border dark:border-gray-700 dark:bg-gray-900" placeholder="Paste your text here..."></textarea>
-    <button onclick="checkPlagiarism()" class="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
-      Check Plagiarism
-    </button>
+
+    <div class="mt-4 flex flex-wrap gap-3 justify-center">
+      <button onclick="checkText()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
+        Check Text
+      </button>
+      <label class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow cursor-pointer">
+        <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
+        Upload File
+      </label>
+    </div>
 
     <!-- Spinner -->
     <div id="spinner" class="mt-6 flex justify-center hidden">
@@ -31,14 +40,14 @@
     </div>
 
     <!-- Results -->
-    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-inner">
+    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-inner text-sm">
       Result will appear here...
     </div>
   </main>
 
   <!-- Script -->
   <script>
-    // Dark Mode Toggle
+    // 🌓 Dark Mode Toggle
     const toggleBtn = document.getElementById('darkToggle');
     const toggleCircle = document.getElementById('toggleCircle');
     const htmlEl = document.documentElement;
@@ -59,48 +68,108 @@
       }
     });
 
-    // Plagiarism Check Function
-    async function checkPlagiarism() {
-      const text = document.getElementById("inputText").value;
+    const backendUrl = "http://127.0.0.1:5000"; // Change this when deployed
+
+    // 🧠 Check TEXT
+    async function checkText() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) {
+        alert("Please enter some text to check.");
+        return;
+      }
       const resultBox = document.getElementById("result");
       const spinner = document.getElementById("spinner");
-
-      resultBox.innerText = "";
       spinner.classList.remove("hidden");
+      resultBox.innerText = "";
 
       try {
-        const response = await fetch("http://127.0.0.1:5000/check", {
-
+        const response = await fetch(`${backendUrl}/check-text`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text })
         });
-
         const data = await response.json();
-
         spinner.classList.add("hidden");
 
-        // Build a nice report
-        let output = `<p class="font-semibold text-lg">Overall Score: ${data.overall_score}% → ${data.message}</p>`;
-        output += `<ul class="mt-3 space-y-2">`;
-        data.details.forEach(d => {
-          output += `<li class="p-2 rounded-lg bg-gray-200 dark:bg-gray-600">
-                      <span class="font-medium">"${d.sentence}"</span> → 
-                      <span class="text-indigo-600 dark:text-indigo-300">${d.score}%</span>
-                    </li>`;
-        });
-        output += `</ul>`;
-
-        resultBox.innerHTML = output;
-
-      } catch (error) {
+        if (data.error) {
+          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
+          return;
+        }
+        showResults(data);
+      } catch (err) {
         spinner.classList.add("hidden");
-        resultBox.innerText = "❌ Error: Could not connect to backend.";
+        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
       }
+    }
+
+    // 📁 Check FILE
+    async function checkFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return;
+
+      const resultBox = document.getElementById("result");
+      const spinner = document.getElementById("spinner");
+      spinner.classList.remove("hidden");
+      resultBox.innerText = "";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch(`${backendUrl}/check-file`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await response.json();
+        spinner.classList.add("hidden");
+
+        if (data.error) {
+          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
+          return;
+        }
+        showResults(data);
+      } catch (err) {
+        spinner.classList.add("hidden");
+        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
+      }
+    }
+
+    // 🧾 Display Results
+    function showResults(data) {
+      const resultBox = document.getElementById("result");
+      let html = `<p class="font-semibold text-lg mb-3">Overall Score: <span class="text-indigo-600">${data.overall_score}%</span> → ${data.message}</p>`;
+      
+      data.details.forEach((d, i) => {
+        html += `
+        <div class="mb-3 p-3 rounded-lg bg-gray-200 dark:bg-gray-600">
+          <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${d.best_similarity}</span></p>
+          <p class="mt-1 text-sm">${escapeHtml(d.chunk_text)}</p>
+          ${d.matches && d.matches.length ? `<p class="mt-2 text-xs text-gray-700 dark:text-gray-300">Matches:</p>
+          <ul class="text-xs list-disc ml-5 mt-1">
+            ${d.matches.map(m => `<li><strong>${m.source}</strong> (${m.similarity})<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
+          </ul>` : ""}
+        </div>`;
+      });
+
+      resultBox.innerHTML = html;
+    }
+
+    // 🔒 Escape HTML for safe rendering
+    function escapeHtml(unsafe) {
+      return unsafe.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[m]);
     }
   </script>
 </body>
 </html>
+
+
+
 
 
 
