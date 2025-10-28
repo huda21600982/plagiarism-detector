@@ -11,32 +11,34 @@
   <!-- Header -->
   <header class="p-6 bg-indigo-600 dark:bg-indigo-800 shadow-md flex justify-between items-center">
     <h1 class="text-2xl font-bold text-white">AI Plagiarism Detector</h1>
-    <!-- Dark mode toggle -->
     <button id="darkToggle" class="w-14 h-7 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center transition">
       <div id="toggleCircle" class="w-6 h-6 bg-white rounded-full shadow transform transition"></div>
     </button>
   </header>
 
   <!-- Main -->
-  <main class="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
+  <main class="max-w-4xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
     <h2 class="text-xl font-semibold mb-6 text-center">Check for Plagiarism</h2>
 
     <!-- Text Input -->
     <textarea id="inputText" rows="6" class="w-full p-3 rounded-lg border dark:border-gray-700 dark:bg-gray-900" placeholder="Paste your text here..."></textarea>
 
+    <!-- Buttons and Upload -->
     <div class="mt-4 flex flex-wrap gap-3 justify-center">
       <button id="checkTextBtn" onclick="checkText()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
         Check Text
       </button>
-      <label class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow cursor-pointer">
-        <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
-        Upload File
-      </label>
+
+      <!-- Drag & Drop + Multiple File Upload -->
+      <div id="dropZone" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow text-center cursor-pointer relative">
+        Drag & Drop or Click to Upload Files
+        <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple onchange="checkFiles()" />
+      </div>
     </div>
 
     <!-- Spinner -->
     <div id="spinner" class="mt-6 flex justify-center hidden">
-      <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Results -->
@@ -45,9 +47,8 @@
     </div>
   </main>
 
-  <!-- Script -->
   <script>
-    // 🌓 Dark Mode Toggle
+    // Dark Mode Toggle
     const toggleBtn = document.getElementById('darkToggle');
     const toggleCircle = document.getElementById('toggleCircle');
     const htmlEl = document.documentElement;
@@ -70,70 +71,7 @@
 
     const backendUrl = "http://127.0.0.1:5000"; // Change when deployed
 
-    // 🧠 Check TEXT
-    async function checkText() {
-      const text = document.getElementById("inputText").value.trim();
-      if (!text) {
-        alert("Please enter some text to check.");
-        return;
-      }
-
-      toggleLoading(true);
-      const resultBox = document.getElementById("result");
-      resultBox.innerText = "";
-
-      try {
-        const response = await fetch(`${backendUrl}/check-text`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
-        });
-        const data = await response.json();
-        toggleLoading(false);
-
-        if (data.error) {
-          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
-          return;
-        }
-        showResults(data);
-      } catch (err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
-      }
-    }
-
-    // 📁 Check FILE
-    async function checkFile() {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file) return;
-
-      toggleLoading(true);
-      const resultBox = document.getElementById("result");
-      resultBox.innerText = "";
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await fetch(`${backendUrl}/check-file`, {
-          method: "POST",
-          body: formData
-        });
-        const data = await response.json();
-        toggleLoading(false);
-
-        if (data.error) {
-          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
-          return;
-        }
-        showResults(data);
-      } catch (err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
-      }
-    }
-
-    // 🔄 Toggle loading state
+    // Toggle spinner
     function toggleLoading(isLoading) {
       const spinner = document.getElementById("spinner");
       const textBtn = document.getElementById("checkTextBtn");
@@ -141,33 +79,89 @@
       textBtn.disabled = isLoading;
     }
 
-    // 🧾 Display Results
-    function showResults(data) {
-      const resultBox = document.getElementById("result");
-      let html = `<p class="font-semibold text-lg mb-3">Overall Score: <span class="text-indigo-600">${data.overall_score}%</span> → ${data.message}</p>`;
-      
-      data.details.forEach((d, i) => {
-        html += `
-        <div class="mb-3 p-3 rounded-lg bg-gray-200 dark:bg-gray-600">
-          <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${(d.best_similarity*100).toFixed(2)}%</span></p>
-          <p class="mt-1 text-sm">${escapeHtml(d.chunk_text)}</p>
-          ${d.matches && d.matches.length ? `<p class="mt-2 text-xs text-gray-700 dark:text-gray-300">Matches:</p>
-          <ul class="text-xs list-disc ml-5 mt-1">
-            ${d.matches.slice(0,3).map(m => `<li><strong>${m.source}</strong> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
-          </ul>` : ""}
-        </div>`;
-      });
-
-      resultBox.innerHTML = html;
-    }
-
-    // 🔒 Escape HTML
+    // Escape HTML
     function escapeHtml(unsafe) {
       return unsafe.replace(/[&<>"']/g, (m) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+    }
+
+    // Show error
+    function showError(msg) {
+      document.getElementById("result").innerHTML = `<p class='text-red-500 font-semibold'>❌ ${msg}</p>`;
+    }
+
+    // Format and display results
+    function formatResults(data) {
+      let html = `<p class="font-semibold mb-2">Overall Score: <span class="text-indigo-600">${data.overall_score}%</span> → ${data.message}</p>`;
+      data.details.forEach((d,i)=>{
+        html += `
+          <div class="mb-2 p-2 rounded-lg bg-gray-200 dark:bg-gray-600">
+            <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${(d.best_similarity*100).toFixed(2)}%</span></p>
+            <p class="mt-1 text-sm">${escapeHtml(d.chunk_text)}</p>
+            ${d.matches && d.matches.length ? `<p class="mt-1 text-xs text-gray-700 dark:text-gray-300">Matches:</p>
+            <ul class="text-xs list-disc ml-5 mt-1">
+              ${d.matches.slice(0,3).map(m=>`<li><strong>${m.source}</strong> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
+            </ul>` : ""}
+          </div>`;
+      });
+      return html;
+    }
+
+    function showResults(data) {
+      document.getElementById("result").innerHTML = formatResults(data);
+    }
+
+    // Check TEXT
+    async function checkText() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) return alert("Please enter some text.");
+
+      toggleLoading(true);
+      document.getElementById("result").innerText = "";
+
+      try {
+        const res = await fetch(`${backendUrl}/check-text`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({text})
+        });
+        const data = await res.json();
+        toggleLoading(false);
+        if (data.error) return showError(data.error);
+        showResults(data);
+      } catch(e) {
+        toggleLoading(false);
+        showError("Could not connect to backend.");
+      }
+    }
+
+    // Check multiple FILES
+    async function checkFiles() {
+      const files = document.getElementById("fileInput").files;
+      if (!files.length) return;
+      toggleLoading(true);
+      document.getElementById("result").innerText = "";
+
+      let resultsHtml = "";
+      for (let i=0; i<files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const res = await fetch(`${backendUrl}/check-file`, {method:"POST", body:formData});
+          const data = await res.json();
+          if (data.error) resultsHtml += `<p class="text-red-500 font-semibold">${file.name}: ${data.error}</p>`;
+          else resultsHtml += `<h3 class="font-semibold mt-3">${file.name}</h3>` + formatResults(data);
+        } catch(e) {
+          resultsHtml += `<p class="text-red-500 font-semibold">${file.name}: Could not connect to backend.</p>`;
+        }
+      }
+      toggleLoading(false);
+      document.getElementById("result").innerHTML = resultsHtml;
     }
   </script>
 </body>
 </html>
+
 
 
 
