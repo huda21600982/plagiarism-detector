@@ -1,183 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Plagiarism Detector</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Plagiarism Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-navy': '#3730A3', // Deeper Indigo/Navy
+                        'primary-accent': '#06B6D4', // Modern Cyan/Teal
+                        'light-bg': '#F9FAFB', // Lighter body background
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'], // Apply Inter font globally
+                    },
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-light-bg dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
 
-  <!-- Header -->
-  <header class="p-6 bg-indigo-600 dark:bg-indigo-800 shadow-md flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-white">AI Plagiarism Detector</h1>
-    <!-- Dark mode toggle -->
-    <button id="darkToggle" class="w-14 h-7 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center transition">
-      <div id="toggleCircle" class="w-6 h-6 bg-white rounded-full shadow transform transition"></div>
-    </button>
-  </header>
+    <header class="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-lg flex justify-between items-center border-b dark:border-gray-700">
+        <h1 class="text-xl sm:text-2xl font-bold text-primary-navy dark:text-primary-accent">AI Plagiarism Detector</h1>
+        
+        <div class="flex items-center space-x-2">
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">Dark Mode</span>
+            <button id="darkToggle" class="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center transition-colors duration-300 p-0.5">
+                <div id="toggleCircle" class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 dark:translate-x-6"></div>
+            </button>
+        </div>
+    </header>
 
-  <!-- Main -->
-  <main class="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-    <h2 class="text-xl font-semibold mb-6 text-center">Check for Plagiarism</h2>
+    <main class="max-w-4xl mx-auto mt-8 sm:mt-12 p-6 sm:p-10 bg-white dark:bg-gray-800 rounded-xl shadow-2xl shadow-gray-200 dark:shadow-gray-900/50">
+        <h2 class="text-2xl font-semibold mb-8 text-center text-primary-navy dark:text-primary-accent">Start Your Plagiarism Scan</h2>
 
-    <!-- Text Input -->
-    <textarea id="inputText" rows="6" class="w-full p-3 rounded-lg border dark:border-gray-700 dark:bg-gray-900" placeholder="Paste your text here..."></textarea>
+        <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-navy/50 focus:border-primary-navy/50 dark:focus:ring-primary-accent dark:focus:border-primary-accent transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
 
-    <div class="mt-4 flex flex-wrap gap-3 justify-center">
-      <button id="checkTextBtn" onclick="checkText()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
-        Check Text
-      </button>
-      <label class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow cursor-pointer">
-        <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
-        Upload File
-      </label>
-    </div>
+        <div class="mt-6 flex flex-wrap gap-4 justify-center">
+            <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-navy hover:bg-primary-navy/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-navy/30 transition transform hover:-translate-y-0.5">
+                Check Text
+            </button>
+            <label class="px-8 py-3 bg-primary-accent hover:bg-primary-accent/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-accent/30 cursor-pointer transition transform hover:-translate-y-0.5">
+                <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
+                Upload Document
+            </label>
+        </div>
 
-    <!-- Spinner -->
-    <div id="spinner" class="mt-6 flex justify-center hidden">
-      <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>
+        <div id="spinner" class="mt-8 flex justify-center hidden">
+            <div class="w-10 h-10 border-4 border-primary-navy dark:border-primary-accent border-t-transparent rounded-full animate-spin"></div>
+        </div>
 
-    <!-- Results -->
-    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-inner text-sm overflow-x-auto">
-      Result will appear here...
-    </div>
-  </main>
+        <div class="mt-8 p-6 rounded-xl bg-gray-50 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 shadow-inner text-base overflow-x-auto">
+            <p class="font-medium text-gray-500 dark:text-gray-400 mb-1">SCAN RESULTS:</p>
+            <div id="result">Result will appear here...</div>
+        </div>
+    </main>
 
-  <!-- Script -->
-  <script>
-    // 🌓 Dark Mode Toggle
-    const toggleBtn = document.getElementById('darkToggle');
-    const toggleCircle = document.getElementById('toggleCircle');
-    const htmlEl = document.documentElement;
+    <script>
+        // 🌓 Dark Mode Toggle
+        const toggleBtn = document.getElementById('darkToggle');
+        const toggleCircle = document.getElementById('toggleCircle');
+        const htmlEl = document.documentElement;
 
-    if (localStorage.getItem('theme') === 'dark') {
-      htmlEl.classList.add('dark');
-      toggleCircle.classList.add('translate-x-8');
-    }
+        // Check initial state
+        const isDark = localStorage.getItem('theme') === 'dark' || 
+                       (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-    toggleBtn.addEventListener('click', () => {
-      htmlEl.classList.toggle('dark');
-      if (htmlEl.classList.contains('dark')) {
-        localStorage.setItem('theme', 'dark');
-        toggleCircle.classList.add('translate-x-8');
-      } else {
-        localStorage.setItem('theme', 'light');
-        toggleCircle.classList.remove('translate-x-8');
-      }
-    });
+        if (isDark) {
+            htmlEl.classList.add('dark');
+            toggleCircle.classList.add('translate-x-6'); // Adjusted for w-12 h-6 button
+        }
 
-    const backendUrl = "http://127.0.0.1:5000"; // Change when deployed
-
-    // 🧠 Check TEXT
-    async function checkText() {
-      const text = document.getElementById("inputText").value.trim();
-      if (!text) {
-        alert("Please enter some text to check.");
-        return;
-      }
-
-      toggleLoading(true);
-      const resultBox = document.getElementById("result");
-      resultBox.innerText = "";
-
-      try {
-        const response = await fetch(`${backendUrl}/check-text`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
+        toggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                toggleCircle.classList.add('translate-x-6');
+            } else {
+                localStorage.setItem('theme', 'light');
+                toggleCircle.classList.remove('translate-x-6');
+            }
         });
-        const data = await response.json();
-        toggleLoading(false);
 
-        if (data.error) {
-          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
-          return;
-        }
-        resultBox.innerHTML = formatResults(data);
-      } catch (err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
-      }
-    }
+        const backendUrl = "http://127.0.0.1:5000"; // Change when deployed
 
-    // 📁 Check FILE
-    async function checkFile() {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file) return;
+        // 🧠 Check TEXT
+        async function checkText() {
+            const text = document.getElementById("inputText").value.trim();
+            if (!text) {
+                alert("Please enter some text to check.");
+                return;
+            }
 
-      toggleLoading(true);
-      const resultBox = document.getElementById("result");
-      resultBox.innerText = "";
+            toggleLoading(true);
+            const resultBox = document.getElementById("result");
+            resultBox.innerHTML = '<p class="text-sm italic text-gray-500 dark:text-gray-400">Scanning in progress...</p>';
 
-      const formData = new FormData();
-      formData.append("file", file);
+            try {
+                const response = await fetch(`${backendUrl}/check-text`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                toggleLoading(false);
 
-      try {
-        const response = await fetch(`${backendUrl}/check-file`, {
-          method: "POST",
-          body: formData
-        });
-        const data = await response.json();
-        toggleLoading(false);
-
-        if (data.error) {
-          resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
-          return;
-        }
-        resultBox.innerHTML = formatResults(data);
-      } catch (err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
-      }
-    }
-
-    // 🔄 Toggle loading state
-    function toggleLoading(isLoading) {
-      const spinner = document.getElementById("spinner");
-      const textBtn = document.getElementById("checkTextBtn");
-      spinner.classList.toggle("hidden", !isLoading);
-      textBtn.disabled = isLoading;
-    }
-
-    // 🖍 Format Results with Highlighted Matches
-    function formatResults(data) {
-      let html = `<p class="font-semibold text-lg mb-3">Overall Score: <span class="text-indigo-600">${data.overall_score}%</span> → ${data.message}</p>`;
-      
-      data.details.forEach((d,i)=>{
-        let chunkText = escapeHtml(d.chunk_text);
-
-        // Highlight matched text
-        if (d.matches && d.matches.length) {
-          d.matches.forEach(match => {
-            const matchedSnippet = escapeHtml(match.matched_text.slice(0, 150));
-            const re = new RegExp(matchedSnippet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            chunkText = chunkText.replace(re, `<span class="bg-yellow-300 dark:bg-yellow-600">${matchedSnippet}</span>`);
-          });
+                if (!response.ok || data.error) {
+                    resultBox.innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>Error: ${data.error || 'An unknown error occurred.'}</p></div>`;
+                    return;
+                }
+                resultBox.innerHTML = formatResults(data);
+            } catch (err) {
+                toggleLoading(false);
+                resultBox.innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>❌ Connection Error: Could not connect to backend.</p></div>`;
+            }
         }
 
-        html += `
-        <div class="mb-3 p-3 rounded-lg bg-gray-200 dark:bg-gray-600">
-          <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${(d.best_similarity*100).toFixed(2)}%</span></p>
-          <p class="mt-1 text-sm">${chunkText}</p>
-          ${d.matches && d.matches.length ? `<p class="mt-2 text-xs text-gray-700 dark:text-gray-300">Matches:</p>
-          <ul class="text-xs list-disc ml-5 mt-1">
-            ${d.matches.slice(0,3).map(m=>`<li><strong>${m.source}</strong> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
-          </ul>` : ""}
-        </div>`;
-      });
+        // 📁 Check FILE
+        async function checkFile() {
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) return;
 
-      return html;
-    }
+            toggleLoading(true);
+            const resultBox = document.getElementById("result");
+            resultBox.innerHTML = '<p class="text-sm italic text-gray-500 dark:text-gray-400">Uploading and scanning file...</p>';
 
-    // 🔒 Escape HTML
-    function escapeHtml(unsafe) {
-      return unsafe.replace(/[&<>"']/g, (m) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-    }
-  </script>
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch(`${backendUrl}/check-file`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                toggleLoading(false);
+
+                if (!response.ok || data.error) {
+                    resultBox.innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>Error: ${data.error || 'An unknown error occurred.'}</p></div>`;
+                    return;
+                }
+                resultBox.innerHTML = formatResults(data);
+            } catch (err) {
+                toggleLoading(false);
+                resultBox.innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>❌ Connection Error: Could not connect to backend.</p></div>`;
+            }
+        }
+
+        // 🔄 Toggle loading state
+        function toggleLoading(isLoading) {
+            const spinner = document.getElementById("spinner");
+            const textBtn = document.getElementById("checkTextBtn");
+            const fileInput = document.getElementById("fileInput").parentNode;
+            
+            spinner.classList.toggle("hidden", !isLoading);
+            textBtn.disabled = isLoading;
+            fileInput.classList.toggle("pointer-events-none", isLoading);
+            fileInput.classList.toggle("opacity-50", isLoading);
+        }
+
+        // 🖍 Format Results with Highlighted Matches (Improved styling)
+        function formatResults(data) {
+            // Apply color coding based on score (cleaner visual feedback)
+            let scoreColor = 'text-green-500'; // Low plagiarism
+            if (data.overall_score > 30) scoreColor = 'text-yellow-500'; // Medium plagiarism
+            if (data.overall_score > 60) scoreColor = 'text-red-500'; // High plagiarism
+
+            let html = `<div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-600">
+                <p class="font-extrabold text-2xl">Similarity Score: <span class="${scoreColor}">${data.overall_score}%</span></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${data.message}</p>
+            </div>`;
+            
+            data.details.forEach((d,i)=>{
+                let chunkText = escapeHtml(d.chunk_text);
+
+                // Highlight matched text
+                if (d.matches && d.matches.length) {
+                    d.matches.forEach(match => {
+                        const matchedSnippet = escapeHtml(match.matched_text.slice(0, 150));
+                        // Using a more robust regex for highlighting
+                        const re = new RegExp(matchedSnippet.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1'), 'g');
+                        chunkText = chunkText.replace(re, `<span class="bg-yellow-300/80 dark:bg-yellow-600/80 rounded-sm">${matchedSnippet}</span>`);
+                    });
+                }
+
+                html += `
+                <div class="mb-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-600 border border-gray-200 dark:border-gray-700">
+                    <p class="font-semibold text-base mb-2">Chunk ${i+1}: <span class="text-primary-navy dark:text-primary-accent">${(d.best_similarity*100).toFixed(2)}% Similarity</span></p>
+                    <p class="mt-1 text-sm leading-relaxed whitespace-pre-wrap">${chunkText}</p>
+                    
+                    ${d.matches && d.matches.length ? `<p class="mt-3 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-300 dark:border-gray-500 pt-2">Top Matches:</p>
+                    <ul class="text-xs list-disc ml-5 mt-1 space-y-1">
+                        ${d.matches.slice(0,3).map(m=>`<li><a href="${m.source_url || '#'}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">${m.source}</a> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,100))}...</em></li>`).join('')}
+                    </ul>` : `<p class="mt-3 text-xs text-gray-500 dark:text-gray-400">No significant external matches found for this chunk.</p>`}
+                </div>`;
+            });
+
+            return html;
+        }
+
+        // 🔒 Escape HTML
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/[&<>"']/g, (m) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+        }
+    </script>
 </body>
 </html>
+
 
 
 
