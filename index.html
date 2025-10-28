@@ -11,9 +11,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-navy': '#3730A3', // Deeper Indigo/Navy
-                        'primary-accent': '#06B6D4', // Modern Cyan/Teal
-                        'light-bg': '#F9FAFB', // Lighter body background
+                        'primary-blue': '#2563EB',   // Lighter, vibrant blue
+                        'accent-purple': '#C084FC', // Lighter, complementary purple
+                        'light-bg': '#F9FAFB',      // Lighter body background
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'], // Apply Inter font globally
@@ -26,7 +26,7 @@
 <body class="bg-light-bg dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
 
     <header class="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-lg flex justify-between items-center border-b dark:border-gray-700">
-        <h1 class="text-xl sm:text-2xl font-bold text-primary-navy dark:text-primary-accent">AI Plagiarism Detector</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-primary-blue dark:text-accent-purple">AI Plagiarism Detector</h1>
         
         <div class="flex items-center space-x-2">
             <span class="text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">Dark Mode</span>
@@ -37,22 +37,22 @@
     </header>
 
     <main class="max-w-4xl mx-auto mt-8 sm:mt-12 p-6 sm:p-10 bg-white dark:bg-gray-800 rounded-xl shadow-2xl shadow-gray-200 dark:shadow-gray-900/50">
-        <h2 class="text-2xl font-semibold mb-8 text-center text-primary-navy dark:text-primary-accent">Start Your Plagiarism Scan</h2>
+        <h2 class="text-2xl font-semibold mb-8 text-center text-primary-blue dark:text-accent-purple">Start Your Plagiarism Scan</h2>
 
-        <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-navy/50 focus:border-primary-navy/50 dark:focus:ring-primary-accent dark:focus:border-primary-accent transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
+        <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
 
         <div class="mt-6 flex flex-wrap gap-4 justify-center">
-            <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-navy hover:bg-primary-navy/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-navy/30 transition transform hover:-translate-y-0.5">
+            <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-blue/30 transition transform hover:-translate-y-0.5">
                 Check Text
             </button>
-            <label class="px-8 py-3 bg-primary-accent hover:bg-primary-accent/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-accent/30 cursor-pointer transition transform hover:-translate-y-0.5">
+            <label class="px-8 py-3 bg-accent-purple hover:bg-accent-purple/90 text-white rounded-xl font-semibold shadow-lg shadow-accent-purple/30 cursor-pointer transition transform hover:-translate-y-0.5">
                 <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
                 Upload Document
             </label>
         </div>
 
         <div id="spinner" class="mt-8 flex justify-center hidden">
-            <div class="w-10 h-10 border-4 border-primary-navy dark:border-primary-accent border-t-transparent rounded-full animate-spin"></div>
+            <div class="w-10 h-10 border-4 border-primary-blue dark:border-accent-purple border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         <div class="mt-8 p-6 rounded-xl bg-gray-50 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 shadow-inner text-base overflow-x-auto">
@@ -191,7 +191,7 @@
 
                 html += `
                 <div class="mb-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-600 border border-gray-200 dark:border-gray-700">
-                    <p class="font-semibold text-base mb-2">Chunk ${i+1}: <span class="text-primary-navy dark:text-primary-accent">${(d.best_similarity*100).toFixed(2)}% Similarity</span></p>
+                    <p class="font-semibold text-base mb-2">Chunk ${i+1}: <span class="text-primary-blue dark:text-accent-purple">${(d.best_similarity*100).toFixed(2)}% Similarity</span></p>
                     <p class="mt-1 text-sm leading-relaxed whitespace-pre-wrap">${chunkText}</p>
                     
                     ${d.matches && d.matches.length ? `<p class="mt-3 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-300 dark:border-gray-500 pt-2">Top Matches:</p>
