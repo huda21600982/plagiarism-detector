@@ -25,7 +25,7 @@
     <textarea id="inputText" rows="6" class="w-full p-3 rounded-lg border dark:border-gray-700 dark:bg-gray-900" placeholder="Paste your text here..."></textarea>
 
     <div class="mt-4 flex flex-wrap gap-3 justify-center">
-      <button onclick="checkText()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
+      <button id="checkTextBtn" onclick="checkText()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow">
         Check Text
       </button>
       <label class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow cursor-pointer">
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Results -->
-    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-inner text-sm">
+    <div id="result" class="mt-6 p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-inner text-sm overflow-x-auto">
       Result will appear here...
     </div>
   </main>
@@ -68,7 +68,7 @@
       }
     });
 
-    const backendUrl = "http://127.0.0.1:5000"; // Change this when deployed
+    const backendUrl = "http://127.0.0.1:5000"; // Change when deployed
 
     // 🧠 Check TEXT
     async function checkText() {
@@ -77,9 +77,9 @@
         alert("Please enter some text to check.");
         return;
       }
+
+      toggleLoading(true);
       const resultBox = document.getElementById("result");
-      const spinner = document.getElementById("spinner");
-      spinner.classList.remove("hidden");
       resultBox.innerText = "";
 
       try {
@@ -89,7 +89,7 @@
           body: JSON.stringify({ text })
         });
         const data = await response.json();
-        spinner.classList.add("hidden");
+        toggleLoading(false);
 
         if (data.error) {
           resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
@@ -97,7 +97,7 @@
         }
         showResults(data);
       } catch (err) {
-        spinner.classList.add("hidden");
+        toggleLoading(false);
         resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
       }
     }
@@ -107,9 +107,8 @@
       const file = document.getElementById("fileInput").files[0];
       if (!file) return;
 
+      toggleLoading(true);
       const resultBox = document.getElementById("result");
-      const spinner = document.getElementById("spinner");
-      spinner.classList.remove("hidden");
       resultBox.innerText = "";
 
       const formData = new FormData();
@@ -121,7 +120,7 @@
           body: formData
         });
         const data = await response.json();
-        spinner.classList.add("hidden");
+        toggleLoading(false);
 
         if (data.error) {
           resultBox.innerHTML = `<p class='text-red-500'>Error: ${data.error}</p>`;
@@ -129,9 +128,17 @@
         }
         showResults(data);
       } catch (err) {
-        spinner.classList.add("hidden");
+        toggleLoading(false);
         resultBox.innerHTML = `<p class='text-red-500'>❌ Error: Could not connect to backend.</p>`;
       }
+    }
+
+    // 🔄 Toggle loading state
+    function toggleLoading(isLoading) {
+      const spinner = document.getElementById("spinner");
+      const textBtn = document.getElementById("checkTextBtn");
+      spinner.classList.toggle("hidden", !isLoading);
+      textBtn.disabled = isLoading;
     }
 
     // 🧾 Display Results
@@ -142,11 +149,11 @@
       data.details.forEach((d, i) => {
         html += `
         <div class="mb-3 p-3 rounded-lg bg-gray-200 dark:bg-gray-600">
-          <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${d.best_similarity}</span></p>
+          <p class="font-semibold">Chunk ${i+1}: Similarity <span class="text-indigo-500">${(d.best_similarity*100).toFixed(2)}%</span></p>
           <p class="mt-1 text-sm">${escapeHtml(d.chunk_text)}</p>
           ${d.matches && d.matches.length ? `<p class="mt-2 text-xs text-gray-700 dark:text-gray-300">Matches:</p>
           <ul class="text-xs list-disc ml-5 mt-1">
-            ${d.matches.map(m => `<li><strong>${m.source}</strong> (${m.similarity})<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
+            ${d.matches.slice(0,3).map(m => `<li><strong>${m.source}</strong> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,150))}...</em></li>`).join('')}
           </ul>` : ""}
         </div>`;
       });
@@ -154,19 +161,14 @@
       resultBox.innerHTML = html;
     }
 
-    // 🔒 Escape HTML for safe rendering
+    // 🔒 Escape HTML
     function escapeHtml(unsafe) {
-      return unsafe.replace(/[&<>"']/g, (m) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      })[m]);
+      return unsafe.replace(/[&<>"']/g, (m) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
     }
   </script>
 </body>
 </html>
+
 
 
 
