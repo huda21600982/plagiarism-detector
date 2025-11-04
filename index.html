@@ -53,7 +53,7 @@
         </select>
     </div>
 
-    <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here..."></textarea>
+    <textarea id="inputText" maxlength="10000" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
 
     <div class="mt-6 flex flex-wrap gap-4 justify-center">
         <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-blue/30 transition transform hover:-translate-y-0.5">
@@ -113,7 +113,8 @@ async function checkText() {
         const data = await response.json();
         toggleLoading(false);
         resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
-    } catch {
+    } catch(err) {
+        console.error(err);
         toggleLoading(false);
         resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
     }
@@ -136,7 +137,8 @@ async function checkFile() {
         const data = await response.json();
         toggleLoading(false);
         resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
-    } catch {
+    } catch(err) {
+        console.error(err);
         toggleLoading(false);
         resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
     }
@@ -163,7 +165,8 @@ function formatResults(data){
         let chunkText = escapeHtml(d.chunk_text);
         if(d.matches) d.matches.forEach(m=>{
             const snippet = escapeHtml(m.matched_text.slice(0,150));
-            const re = new RegExp(snippet.replace(/([.*+?^=!:${}()|[\]\/\\])/g,'\\$1'),'g');
+            // Multi-line regex for snippet
+            const re = new RegExp(snippet.replace(/([.*+?^=!:${}()|[\]\/\\])/g,'\\$1'), 'gms');
             chunkText = chunkText.replace(re, `<span class="bg-yellow-300/80 dark:bg-yellow-600/80 rounded-sm">${snippet}</span>`);
         });
         html += `<div class="mb-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-600 border border-gray-200 dark:border-gray-700">
@@ -178,6 +181,8 @@ function formatResults(data){
 </script>
 </body>
 </html>
+
+
 
 
 
