@@ -29,7 +29,7 @@
     <h1 class="text-xl sm:text-2xl font-bold text-primary-blue dark:text-accent-purple">AI Plagiarism Detector</h1>
     <div class="flex items-center space-x-2">
         <span class="text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">Dark Mode</span>
-        <button id="darkToggle" class="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center transition-colors duration-300 p-0.5">
+        <button id="darkToggle" class="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center p-0.5">
             <div id="toggleCircle" class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 dark:translate-x-6"></div>
         </button>
     </div>
@@ -38,7 +38,22 @@
 <main class="max-w-4xl mx-auto mt-8 sm:mt-12 p-6 sm:p-10 bg-white dark:bg-gray-800 rounded-xl shadow-2xl shadow-gray-200 dark:shadow-gray-900/50">
     <h2 class="text-2xl font-semibold mb-8 text-center text-primary-blue dark:text-accent-purple">Start Your Plagiarism Scan</h2>
 
-    <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
+    <!-- Language selector -->
+    <div class="mb-4 flex justify-center">
+        <select id="languageSelect" class="p-2 rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-900">
+            <option value="auto">Detect Language</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="hi">Hindi</option>
+            <option value="zh-cn">Chinese (Simplified)</option>
+            <option value="ar">Arabic</option>
+            <option value="ru">Russian</option>
+        </select>
+    </div>
+
+    <textarea id="inputText" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here..."></textarea>
 
     <div class="mt-6 flex flex-wrap gap-4 justify-center">
         <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-blue/30 transition transform hover:-translate-y-0.5">
@@ -61,136 +76,109 @@
 </main>
 
 <script>
-    const toggleBtn = document.getElementById('darkToggle');
-    const toggleCircle = document.getElementById('toggleCircle');
-    const htmlEl = document.documentElement;
-
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-                   (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    if (isDark) {
-        htmlEl.classList.add('dark');
+const toggleBtn = document.getElementById('darkToggle');
+const toggleCircle = document.getElementById('toggleCircle');
+const htmlEl = document.documentElement;
+if (localStorage.getItem('theme') === 'dark') {
+    htmlEl.classList.add('dark');
+    toggleCircle.classList.add('translate-x-6');
+}
+toggleBtn.addEventListener('click', () => {
+    htmlEl.classList.toggle('dark');
+    if (htmlEl.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
         toggleCircle.classList.add('translate-x-6');
+    } else {
+        localStorage.setItem('theme', 'light');
+        toggleCircle.classList.remove('translate-x-6');
     }
+});
 
-    toggleBtn.addEventListener('click', () => {
-        htmlEl.classList.toggle('dark');
-        if (htmlEl.classList.contains('dark')) {
-            localStorage.setItem('theme', 'dark');
-            toggleCircle.classList.add('translate-x-6');
-        } else {
-            localStorage.setItem('theme', 'light');
-            toggleCircle.classList.remove('translate-x-6');
-        }
-    });
+const backendUrl = "http://127.0.0.1:5000";
 
-    const backendUrl = "http://127.0.0.1:5000";
+async function checkText() {
+    const text = document.getElementById("inputText").value.trim();
+    const language = document.getElementById("languageSelect").value;
+    if (!text) return alert("Enter some text.");
+    toggleLoading(true);
+    const resultBox = document.getElementById("result");
+    resultBox.innerHTML = '<p class="italic text-gray-500 dark:text-gray-400">Scanning...</p>';
 
-    function toggleLoading(isLoading) {
-        const spinner = document.getElementById("spinner");
-        const textBtn = document.getElementById("checkTextBtn");
-        const fileInput = document.getElementById("fileInput").parentNode;
-        
-        spinner.classList.toggle("hidden", !isLoading);
-        textBtn.disabled = isLoading;
-        fileInput.classList.toggle("pointer-events-none", isLoading);
-        fileInput.classList.toggle("opacity-50", isLoading);
-    }
-
-    function escapeHtml(unsafe) {
-        return unsafe.replace(/[&<>"']/g, (m) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-    }
-
-    async function checkText() {
-        const text = document.getElementById("inputText").value.trim();
-        if (!text) { alert("Please enter some text."); return; }
-
-        toggleLoading(true);
-        document.getElementById("result").innerHTML = '<p class="text-sm italic text-gray-500 dark:text-gray-400">Scanning in progress...</p>';
-
-        try {
-            const res = await fetch(`${backendUrl}/check-text`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            });
-            const data = await res.json();
-            toggleLoading(false);
-
-            if (!res.ok || data.error) {
-                document.getElementById("result").innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>Error: ${data.error || 'Unknown error'}</p></div>`;
-                return;
-            }
-            document.getElementById("result").innerHTML = formatResults(data);
-
-        } catch(err) {
-            toggleLoading(false);
-            document.getElementById("result").innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>❌ Connection Error</p></div>`;
-        }
-    }
-
-    async function checkFile() {
-        const file = document.getElementById("fileInput").files[0];
-        if (!file) return;
-
-        toggleLoading(true);
-        document.getElementById("result").innerHTML = '<p class="text-sm italic text-gray-500 dark:text-gray-400">Uploading and scanning file...</p>';
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const res = await fetch(`${backendUrl}/check-file`, { method: "POST", body: formData });
-            const data = await res.json();
-            toggleLoading(false);
-
-            if (!res.ok || data.error) {
-                document.getElementById("result").innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>Error: ${data.error || 'Unknown error'}</p></div>`;
-                return;
-            }
-            document.getElementById("result").innerHTML = formatResults(data);
-
-        } catch(err) {
-            toggleLoading(false);
-            document.getElementById("result").innerHTML = `<div class='p-3 bg-red-100 dark:bg-red-900 rounded-lg'><p class='text-red-600 dark:text-red-300 font-semibold'>❌ Connection Error</p></div>`;
-        }
-    }
-
-    function formatResults(data) {
-        let scoreColor = 'text-green-500';
-        if (data.overall_score > 30) scoreColor = 'text-yellow-500';
-        if (data.overall_score > 60) scoreColor = 'text-red-500';
-
-        let html = `<div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-600">
-            <p class="font-extrabold text-2xl">Similarity Score: <span class="${scoreColor}">${data.overall_score}%</span></p>
-            <p class="text-sm text-gray-600 dark:text-gray-300">${data.message}</p>
-        </div>`;
-
-        data.details.forEach((d,i)=>{
-            let chunkText = escapeHtml(d.chunk_text);
-            if (d.matches && d.matches.length) {
-                d.matches.forEach(match => {
-                    const snippet = escapeHtml(match.matched_text.slice(0,150));
-                    const re = new RegExp(snippet.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1'), 'g');
-                    chunkText = chunkText.replace(re, `<span class="bg-yellow-300/80 dark:bg-yellow-600/80 rounded-sm">${snippet}</span>`);
-                });
-            }
-
-            html += `<div class="mb-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-600 border border-gray-200 dark:border-gray-700">
-                <p class="font-semibold text-base mb-2">Chunk ${i+1}: <span class="text-primary-blue dark:text-accent-purple">${(d.best_similarity*100).toFixed(2)}% Similarity</span></p>
-                <p class="mt-1 text-sm leading-relaxed whitespace-pre-wrap">${chunkText}</p>
-                ${d.matches && d.matches.length ? `<p class="mt-3 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-300 dark:border-gray-500 pt-2">Top Matches:</p>
-                <ul class="text-xs list-disc ml-5 mt-1 space-y-1">
-                    ${d.matches.slice(0,3).map(m=>`<li><a href="${m.source_url || '#'}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">${m.source}</a> (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,100))}...</em></li>`).join('')}
-                </ul>` : `<p class="mt-3 text-xs text-gray-500 dark:text-gray-400">No significant external matches found for this chunk.</p>`}
-            </div>`;
+    try {
+        const response = await fetch(`${backendUrl}/check-text`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ text, language })
         });
-
-        return html;
+        const data = await response.json();
+        toggleLoading(false);
+        resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
+    } catch {
+        toggleLoading(false);
+        resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
     }
+}
+
+async function checkFile() {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return;
+    const language = document.getElementById("languageSelect").value;
+    toggleLoading(true);
+    const resultBox = document.getElementById("result");
+    resultBox.innerHTML = '<p class="italic text-gray-500 dark:text-gray-400">Uploading and scanning file...</p>';
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("language", language);
+
+    try {
+        const response = await fetch(`${backendUrl}/check-file`, { method: "POST", body: formData });
+        const data = await response.json();
+        toggleLoading(false);
+        resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
+    } catch {
+        toggleLoading(false);
+        resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
+    }
+}
+
+function toggleLoading(isLoading) {
+    document.getElementById("spinner").classList.toggle("hidden", !isLoading);
+    document.getElementById("checkTextBtn").disabled = isLoading;
+    const fileLabel = document.getElementById("fileInput").parentNode;
+    fileLabel.classList.toggle("pointer-events-none", isLoading);
+    fileLabel.classList.toggle("opacity-50", isLoading);
+}
+
+function escapeHtml(unsafe) {
+    return unsafe.replace(/[&<>"']/g, (m)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function formatResults(data){
+    let scoreColor = 'text-green-500';
+    if(data.overall_score>30) scoreColor='text-yellow-500';
+    if(data.overall_score>60) scoreColor='text-red-500';
+    let html = `<p class="font-bold text-lg mb-3">Overall Score: <span class="${scoreColor}">${data.overall_score}%</span> → ${data.message}</p>`;
+    data.details.forEach((d,i)=>{
+        let chunkText = escapeHtml(d.chunk_text);
+        if(d.matches) d.matches.forEach(m=>{
+            const snippet = escapeHtml(m.matched_text.slice(0,150));
+            const re = new RegExp(snippet.replace(/([.*+?^=!:${}()|[\]\/\\])/g,'\\$1'),'g');
+            chunkText = chunkText.replace(re, `<span class="bg-yellow-300/80 dark:bg-yellow-600/80 rounded-sm">${snippet}</span>`);
+        });
+        html += `<div class="mb-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-600 border border-gray-200 dark:border-gray-700">
+            <p class="font-semibold mb-2">Chunk ${i+1}: ${(d.best_similarity*100).toFixed(2)}% Similarity</p>
+            <p class="text-sm whitespace-pre-wrap">${chunkText}</p>
+            ${d.matches && d.matches.length ? `<p class="mt-2 text-xs font-medium text-gray-700 dark:text-gray-300 border-t pt-1">Top Matches:</p>
+            <ul class="text-xs list-disc ml-5 mt-1">${d.matches.slice(0,3).map(m=>`<li>${escapeHtml(m.source)} (${(m.similarity*100).toFixed(2)}%)<br><em>${escapeHtml(m.matched_text.slice(0,100))}...</em></li>`).join('')}</ul>`: `<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">No significant matches found.</p>`}
+        </div>`;
+    });
+    return html;
+}
 </script>
 </body>
 </html>
+
 
 
 
