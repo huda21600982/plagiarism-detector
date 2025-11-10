@@ -1,195 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Plagiarism Detector</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-    theme: {
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Plagiarism Detector — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
         extend: {
-            colors: {
-                'primary-blue': '#2563EB',
-                'accent-purple': '#C084FC',
-                'light-bg': '#F9FAFB',
-            },
-            fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-            },
+          colors: {
+            'purple-accent': '#7C3AED', /* main purple */
+            'purple-accent-2': '#C084FC',
+            'panel': '#F8FAFF',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
+      }
     }
-}
-</script>
+  </script>
+  <style>
+    /* small utility to show heat colors */
+    .heat-0 { background: linear-gradient(90deg,#ecfccb,#86efac); } /* green */
+    .heat-1 { background: linear-gradient(90deg,#fef9c3,#facc15); } /* yellow */
+    .heat-2 { background: linear-gradient(90deg,#fee2e2,#f43f5e); } /* red */
+    .chunk-highlight { background: rgba(124,58,237,0.12); padding: 2px 4px; border-radius: 4px; }
+    /* small scrollbar style */
+    ::-webkit-scrollbar { height: 8px; width: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
+  </style>
 </head>
-<body class="bg-light-bg dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
 
-<header class="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-lg flex justify-between items-center border-b dark:border-gray-700">
-    <h1 class="text-xl sm:text-2xl font-bold text-primary-blue dark:text-accent-purple">AI Plagiarism Detector</h1>
-    <div class="flex items-center space-x-2">
-        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">Dark Mode</span>
-        <button id="darkToggle" class="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center p-0.5">
-            <div id="toggleCircle" class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 dark:translate-x-6"></div>
-        </button>
+  <!-- Layout: Sidebar + Main -->
+  <div class="min-h-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white dark:bg-gray-800 border-r dark:border-gray-700 hidden md:block">
+      <div class="p-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-purple-accent flex items-center justify-center text-white font-bold">AI</div>
+          <div>
+            <h1 class="text-lg font-extrabold text-gray-900 dark:text-white">PlagAware</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</p>
+          </div>
+        </div>
+
+        <nav class="mt-8 space-y-2">
+          <button id="nav_scan" class="w-full text-left px-3 py-2 rounded-lg bg-purple-accent-2/10 text-sm font-medium text-purple-accent hover:bg-purple-accent-2/20">Scan</button>
+          <button id="nav_corpus" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">Corpus</button>
+          <button id="nav_history" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">History</button>
+        </nav>
+
+        <div class="mt-8">
+          <p class="text-xs text-gray-500 dark:text-gray-400">Corpus size:</p>
+          <div id="corpusCount" class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-200">—</div>
+          <button id="rebuildBtn" class="mt-3 w-full px-3 py-2 bg-purple-accent text-white rounded-lg text-sm">Rebuild Index</button>
+        </div>
+
+        <div class="mt-8 text-xs text-gray-400">Built for your university project • Local only</div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 p-6">
+
+      <!-- Header (mobile + top) -->
+      <header class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button id="openSidebarMobile" class="md:hidden p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Scan · New</h2>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Paste text or upload a document to detect plagiarism</span>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+            <label class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language</label>
+            <select id="languageSelect" class="text-sm bg-transparent outline-none">
+              <option value="auto">Detect</option>
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="hi">Hindi</option>
+              <option value="zh-cn">Chinese (Simplified)</option>
+              <option value="ar">Arabic</option>
+              <option value="ru">Russian</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <button id="themeToggle" class="p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm" title="Toggle theme">
+              <svg id="themeIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/></svg>
+            </button>
+            <button id="openHistoryBtn" class="p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm" title="Open history">
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V3z"/></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Body -->
+      <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left column: input area (spans 2 cols on large screens) -->
+        <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+          <div class="flex items-start justify-between">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
+            <div class="text-sm text-gray-500 dark:text-gray-400">Up to 10,000 chars</div>
+          </div>
+
+          <textarea id="inputText" maxlength="10000" rows="10" class="w-full mt-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-900 text-sm" placeholder="Paste your text here..."></textarea>
+
+          <div class="mt-4 flex items-center gap-3">
+            <button id="checkTextBtn" class="px-5 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">Check Text</button>
+
+            <!-- Drag-drop zone / file input -->
+            <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200">
+              <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" />
+              <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 018 0v8"/></svg>
+              <span id="dropLabel">Drag & drop or click to upload</span>
+            </label>
+
+            <div id="uploadProgress" class="hidden w-48 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div id="uploadBar" class="h-2 bg-purple-accent" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- Corpus Scraper block -->
+          <div class="mt-5 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border dark:border-gray-700">
+            <label class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
+            <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border dark:bg-gray-900 text-sm" placeholder="https://example.com/article"></textarea>
+            <div class="mt-3 flex gap-3">
+              <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white">Add to Corpus</button>
+              <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border">Rebuild Index</button>
+            </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Adding URLs will attempt to scrape and save articles to the corpus directory on the server.</p>
+          </div>
+        </section>
+
+        <!-- Right column: results & history quick view -->
+        <aside class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow space-y-4">
+          <div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Scan Summary</h4>
+            <div id="summaryBox" class="mt-3 text-sm text-gray-600 dark:text-gray-300">No scan yet</div>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Recent Scans</h4>
+            <ul id="historyList" class="mt-3 space-y-2 max-h-48 overflow-auto text-sm"></ul>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Corpus Controls</h4>
+            <div class="mt-2 space-y-2">
+              <div class="text-xs text-gray-500 dark:text-gray-400">Corpus count: <span id="sidebarCorpusCount">—</span></div>
+              <button id="openCorpusBtn" class="w-full mt-2 px-3 py-2 bg-transparent border rounded text-sm">Manage Corpus</button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- RESULTS FULL WIDTH -->
+      <section id="resultsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Scan Results</h3>
+          <div id="overallBadge" class="text-sm font-semibold px-3 py-1 rounded-lg">—</div>
+        </div>
+
+        <div id="resultsContent" class="mt-4 grid grid-cols-1 gap-4"></div>
+      </section>
+
     </div>
-</header>
+  </div>
 
-<main class="max-w-4xl mx-auto mt-8 sm:mt-12 p-6 sm:p-10 bg-white dark:bg-gray-800 rounded-xl shadow-2xl shadow-gray-200 dark:shadow-gray-900/50">
-    <h2 class="text-2xl font-semibold mb-8 text-center text-primary-blue dark:text-accent-purple">Start Your Plagiarism Scan</h2>
+  <script>
+    /* ====== Configuration ====== */
+    const backendUrl = "http://127.0.0.1:5000"; // keep same origin for local testing
+    const SCORE_THRESHOLDS = { low:30, med:60 };
 
-    <!-- Language selector -->
-    <div class="mb-4 flex justify-center">
-        <select id="languageSelect" class="p-2 rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-900">
-            <option value="auto">Detect Language</option>
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="hi">Hindi</option>
-            <option value="zh-cn">Chinese (Simplified)</option>
-            <option value="ar">Arabic</option>
-            <option value="ru">Russian</option>
-        </select>
-    </div>
+    /* ====== DOM refs ====== */
+    const inputText = document.getElementById('inputText');
+    const checkTextBtn = document.getElementById('checkTextBtn');
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const dropLabel = document.getElementById('dropLabel');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadBar = document.getElementById('uploadBar');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const resultsContent = document.getElementById('resultsContent');
+    const overallBadge = document.getElementById('overallBadge');
+    const summaryBox = document.getElementById('summaryBox');
+    const historyList = document.getElementById('historyList');
+    const corpusCount = document.getElementById('corpusCount');
+    const sidebarCorpusCount = document.getElementById('sidebarCorpusCount');
+    const urlList = document.getElementById('urlList');
+    const scrapeBtn = document.getElementById('scrapeBtn');
+    const rebuildBtn = document.getElementById('rebuildBtn');
+    const rebuildSmallBtn = document.getElementById('rebuildSmallBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
 
-    <textarea id="inputText" maxlength="10000" rows="12" class="w-full p-4 text-base rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 focus:ring-2 focus:ring-primary-blue/50 focus:border-primary-blue/50 dark:focus:ring-accent-purple dark:focus:border-accent-purple transition" placeholder="Paste your text here... (Supports up to 10,000 characters)"></textarea>
-
-    <div class="mt-6 flex flex-wrap gap-4 justify-center">
-        <button id="checkTextBtn" onclick="checkText()" class="px-8 py-3 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-xl font-semibold shadow-lg shadow-primary-blue/30 transition transform hover:-translate-y-0.5">
-            Check Text
-        </button>
-        <label class="px-8 py-3 bg-accent-purple hover:bg-accent-purple/90 text-white rounded-xl font-semibold shadow-lg shadow-accent-purple/30 cursor-pointer transition transform hover:-translate-y-0.5">
-            <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" onchange="checkFile()" />
-            Upload Document
-        </label>
-    </div>
-
-    <!-- ✅ INSERTED: Web Corpus Expansion Block -->
-    <div class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border dark:border-gray-600">
-      <p class="font-semibold mb-2">Add Online Sources (Optional)</p>
-      <textarea id="urlList" rows="2" class="w-full p-2 text-sm rounded border dark:bg-gray-900" placeholder="Enter URLs, one per line..."></textarea>
-      <button onclick="scrapeSources()" class="mt-2 px-6 py-2 bg-primary-blue text-white rounded-lg hover:bg-primary-blue/90 transition">
-        Add to Corpus + Rebuild Index
-      </button>
-    </div>
-    <!-- ✅ END INSERT -->
-
-    <div id="spinner" class="mt-8 flex justify-center hidden">
-        <div class="w-10 h-10 border-4 border-primary-blue dark:border-accent-purple border-t-transparent rounded-full animate-spin"></div>
-    </div>
-
-    <div class="mt-8 p-6 rounded-xl bg-gray-50 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 shadow-inner text-base overflow-x-auto">
-        <p class="font-medium text-gray-500 dark:text-gray-400 mb-1">SCAN RESULTS:</p>
-        <div id="result">Result will appear here...</div>
-    </div>
-</main>
-
-<script>
-const toggleBtn = document.getElementById('darkToggle');
-const toggleCircle = document.getElementById('toggleCircle');
-const htmlEl = document.documentElement;
-
-if (localStorage.getItem('theme') === 'dark') {
-    htmlEl.classList.add('dark');
-    toggleCircle.classList.add('translate-x-6');
-}
-
-toggleBtn.addEventListener('click', () => {
-    htmlEl.classList.toggle('dark');
-    if (htmlEl.classList.contains('dark')) {
-        localStorage.setItem('theme', 'dark');
-        toggleCircle.classList.add('translate-x-6');
-    } else {
-        localStorage.setItem('theme', 'light');
-        toggleCircle.classList.remove('translate-x-6');
+    /* ====== keep history in localStorage ====== */
+    function loadHistory() {
+      const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
+      renderHistory(h);
     }
-});
-
-const backendUrl = "http://127.0.0.1:5000";
-
-async function checkText() {
-    const text = document.getElementById("inputText").value.trim();
-    const language = document.getElementById("languageSelect").value;
-    if (!text) return alert("Enter some text.");
-    toggleLoading(true);
-    const resultBox = document.getElementById("result");
-    resultBox.innerHTML = '<p class="italic text-gray-500 dark:text-gray-400">Scanning...</p>';
-
-    try {
-        const response = await fetch(`${backendUrl}/check-text`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ text, language })
-        });
-        const data = await response.json();
-        toggleLoading(false);
-        resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
-    } catch(err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
+    function saveToHistory(item) {
+      const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
+      h.unshift(item);
+      if (h.length > 25) h.pop();
+      localStorage.setItem('scan_history', JSON.stringify(h));
+      renderHistory(h);
     }
-}
-
-async function checkFile() {
-    const file = document.getElementById("fileInput").files[0];
-    if (!file) return;
-    const language = document.getElementById("languageSelect").value;
-    toggleLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("language", language);
-
-    const resultBox = document.getElementById("result");
-
-    try {
-        const response = await fetch(`${backendUrl}/check-file`, { method: "POST", body: formData });
-        const data = await response.json();
-        toggleLoading(false);
-        resultBox.innerHTML = data.error ? `<p class="text-red-500">${data.error}</p>` : formatResults(data);
-    } catch(err) {
-        toggleLoading(false);
-        resultBox.innerHTML = `<p class="text-red-500">❌ Could not connect to backend.</p>`;
+    function renderHistory(h) {
+      historyList.innerHTML = '';
+      if (!h.length) {
+        historyList.innerHTML = '<li class="text-xs text-gray-400">No scans yet</li>';
+        return;
+      }
+      h.forEach((it, idx) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<button data-idx="${idx}" class="w-full text-left text-sm px-2 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">${it.label} · <span class="text-xs text-gray-500">${it.date}</span></button>`;
+        li.querySelector('button').addEventListener('click', ()=> showResultFromHistory(it));
+        historyList.appendChild(li);
+      });
     }
-}
 
-function toggleLoading(isLoading) {
-    document.getElementById("spinner").classList.toggle("hidden", !isLoading);
-}
+    function showResultFromHistory(it) {
+      // Renders the saved result object
+      renderResults(it.data);
+      summaryBox.innerHTML = `<div class="text-sm font-medium">${it.label}</div><div class="text-xs text-gray-500">${it.date}</div>`;
+    }
 
-function escapeHtml(unsafe) {
-    return unsafe.replace(/[&<>"']/g, (m)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-}
-
-function formatResults(data){
-    return `<p class="font-bold text-lg mb-3">Overall Score: <span>${data.overall_score}%</span> → ${data.message}</p>`;
-}
-
-<!-- ✅ INSERTED scrapeSources() FUNCTION -->
-async function scrapeSources() {
-    const raw = document.getElementById("urlList").value.trim();
-    if (!raw) return alert("Enter URLs first!");
-    
-    const urls = raw.split(/\n+/).map(u => u.trim());
-    toggleLoading(true);
-    document.getElementById("result").innerHTML = "<p>📡 Scraping sources...</p>";
-
-    await fetch(`${backendUrl}/scrape`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ urls })
+    /* ====== Theme toggle ====== */
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+    themeToggle.addEventListener('click', ()=>{
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    await fetch(`${backendUrl}/rebuild-index`, { method: "POST" });
+    /* ====== Corpus count loader ====== */
+    async function fetchCorpusCount() {
+      // attempt to call /rebuild-index statusless to get corpus_count by doing a harmless GET to /rebuild-index requires POST,
+      // instead we'll hit a lightweight approach: call /rebuild-index only if user wants. For initial UI, try to show existing index by asking a small endpoint.
+      // We'll attempt to fetch /rebuild-index with an empty POST to read corpus_count if index exists.
+      try {
+        const res = await fetch(`${backendUrl}/rebuild-index`, { method: 'POST' });
+        const j = await res.json();
+        const count = j.corpus_count ?? 0;
+        corpusCount.textContent = `${count} chunks`;
+        sidebarCorpusCount.textContent = `${count}`;
+      } catch(e) {
+        corpusCount.textContent = '—';
+        sidebarCorpusCount.textContent = '—';
+      }
+    }
 
-    toggleLoading(false);
-    document.getElementById("result").innerHTML = "<p class='text-green-500'>✅ Corpus updated & index rebuilt!</p>";
-}
-<!-- ✅ END INSERT -->
+    /* ====== Scanning functions ====== */
+    function setLoading(on, label = 'Scanning...') {
+      if (on) {
+        checkTextBtn.disabled = true;
+        uploadProgress.classList.add('hidden');
+        resultsPanel.classList.add('hidden');
+        summaryBox.innerHTML = `<div class="text-sm text-gray-500">${label}</div>`;
+      } else {
+        checkTextBtn.disabled = false;
+      }
+    }
 
-</script>
+    async function checkText() {
+      const text = inputText.value.trim();
+      const language = document.getElementById('languageSelect').value;
+      if (!text) return alert('Please paste some text to scan.');
+
+      setLoading(true, 'Analyzing text…');
+
+      try {
+        const res = await fetch(`${backendUrl}/check-text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, language })
+        });
+        const j = await res.json();
+        setLoading(false);
+        renderResults(j);
+        saveToHistory({ label: 'Text scan', date: new Date().toLocaleString(), data: j });
+      } catch (err) {
+        setLoading(false);
+        alert('Could not reach backend. Is the server running?');
+        console.error(err);
+      }
+    }
+
+    /* File upload with progress (XHR) */
+    function uploadFileWithProgress(file, language) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('language', language || 'auto');
+
+        xhr.open('POST', `${backendUrl}/check-file`, true);
+
+        xhr.upload.onprogress = function(e) {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            uploadProgress.classList.remove('hidden');
+            uploadBar.style.width = pct + '%';
+          }
+        };
+
+        xhr.onload = function() {
+          uploadProgress.classList.add('hidden');
+          uploadBar.style.width = '0%';
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const json = JSON.parse(xhr.responseText);
+              resolve(json);
+            } catch(e) { reject(e); }
+          } else {
+            reject(new Error('Upload failed: ' + xhr.status));
+          }
+        };
+
+        xhr.onerror = function() { uploadProgress.classList.add('hidden'); reject(new Error('Network error')); };
+        xhr.send(fd);
+      });
+    }
+
+    /* Dropzone handlers */
+    dropZone.addEventListener('click', ()=> fileInput.click());
+    dropZone.addEventListener('dragover', (e)=> { e.preventDefault(); dropZone.classList.add('ring-2','ring-purple-accent/30'); });
+    dropZone.addEventListener('dragleave', ()=> { dropZone.classList.remove('ring-2','ring-purple-accent/30'); });
+    dropZone.addEventListener('drop', async (e)=> {
+      e.preventDefault();
+      dropZone.classList.remove('ring-2','ring-purple-accent/30');
+      const f = e.dataTransfer.files[0];
+      if (!f) return;
+      dropLabel.textContent = f.name;
+      await handleFileUpload(f);
+    });
+    fileInput.addEventListener('change', async ()=> {
+      const f = fileInput.files[0];
+      if (!f) return;
+      dropLabel.textContent = f.name;
+      await handleFileUpload(f);
+    });
+
+    async function handleFileUpload(file) {
+      setLoading(true, 'Uploading file & scanning...');
+      try {
+        const language = document.getElementById('languageSelect').value;
+        const result = await uploadFileWithProgress(file, language);
+        setLoading(false);
+        renderResults(result);
+        saveToHistory({ label: `File: ${file.name}`, date: new Date().toLocaleString(), data: result });
+      } catch(e) {
+        setLoading(false);
+        alert('Upload or scan failed: ' + (e.message || e));
+        console.error(e);
+      }
+    }
+
+    /* Render results function */
+    function renderResults(data) {
+      resultsPanel.classList.remove('hidden');
+      resultsContent.innerHTML = '';
+
+      // overall badge
+      const score = data.overall_score ?? 0;
+      let colorClass = 'text-green-600 bg-green-50';
+      if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
+      else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50';
+      overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
+      overallBadge.textContent = `${score}% — ${data.message || ''}`;
+
+      summaryBox.innerHTML = `<div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div><div class="text-xs text-gray-500">${data.message}</div>`;
+
+      // details (chunks)
+      const details = data.details || [];
+      details.forEach((d, idx) => {
+        const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity*100) : (d.best_similarity || 0);
+        // choose heat class
+        let heatClass = 'heat-0';
+        if (sim > 60) heatClass = 'heat-2';
+        else if (sim > 30) heatClass = 'heat-1';
+        // create card
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
+        // header row with small bar
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-medium">Chunk ${idx+1}</div>
+            <div class="text-sm font-semibold">${sim.toFixed(2)}%</div>
+          </div>
+          <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || d.sentence || '')}</div>
+        `;
+        // matches
+        if (d.matches && d.matches.length) {
+          const ul = document.createElement('ul');
+          ul.className = 'mt-3 text-xs list-disc ml-5';
+          d.matches.slice(0,3).forEach(m => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${escapeHtml(m.source || m.source || 'source')}</strong> — ${(m.similarity*100).toFixed(2)}%<br><em class="text-xs text-gray-500">${escapeHtml((m.matched_text||'').slice(0,120))}...</em>`;
+            ul.appendChild(li);
+          });
+          card.appendChild(ul);
+        } else {
+          const p = document.createElement('p');
+          p.className = 'mt-3 text-xs text-gray-500';
+          p.textContent = 'No strong matches found for this chunk.';
+          card.appendChild(p);
+        }
+
+        // add small heat bar
+        const heat = document.createElement('div');
+        heat.className = `mt-3 h-2 rounded-full ${heatClass}`;
+        heat.style.width = Math.min(100, Math.max(6, sim)) + '%';
+        card.appendChild(heat);
+
+        resultsContent.appendChild(card);
+      });
+
+      // scroll to results
+      resultsPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* Utility: escape HTML */
+    function escapeHtml(s='') {
+      return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
+    }
+
+    /* ====== Corpus & Scrape handlers ====== */
+    scrapeBtn.addEventListener('click', async () => {
+      const raw = urlList.value.trim();
+      if (!raw) return alert('Enter at least one URL (newline separated).');
+      const urls = raw.split(/\n+/).map(u=>u.trim()).filter(Boolean);
+      setLoading(true, 'Scraping sources...');
+      try {
+        const res = await fetch(`${backendUrl}/scrape`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls })
+        });
+        const j = await res.json();
+        // optionally show saved paths
+        setLoading(false);
+        alert(`Saved ${j.saved_count || 0} documents to corpus.`);
+        // trigger rebuild
+        await rebuildIndex();
+      } catch(e) {
+        setLoading(false);
+        alert('Scrape failed. See console.');
+        console.error(e);
+      }
+    });
+
+    async function rebuildIndex() {
+      try {
+        setLoading(true, 'Rebuilding index...');
+        const res = await fetch(`${backendUrl}/rebuild-index`, { method: 'POST' });
+        const j = await res.json();
+        setLoading(false);
+        corpusCount.textContent = `${j.corpus_count ?? 0} chunks`;
+        sidebarCorpusCount.textContent = `${j.corpus_count ?? 0}`;
+        alert('Index rebuilt. Corpus size: ' + (j.corpus_count || 0));
+      } catch(e) {
+        setLoading(false);
+        alert('Rebuild failed.');
+        console.error(e);
+      }
+    }
+
+    rebuildBtn.addEventListener('click', rebuildIndex);
+    rebuildSmallBtn.addEventListener('click', rebuildIndex);
+
+    /* ====== Init & bindings ====== */
+    checkTextBtn.addEventListener('click', checkText);
+
+    // initial UI state
+    loadHistory();
+    fetchCorpusCount();
+
+    // expose some debug shortcuts
+    window.__plag_ui = { renderResults, rebuildIndex };
+
+  </script>
 </body>
 </html>
+
+
 
 
 
