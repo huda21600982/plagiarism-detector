@@ -93,7 +93,9 @@
       <header class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <button id="openSidebarMobile" class="md:hidden p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
           </button>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">Scan · New</h2>
           <span class="text-sm text-gray-500 dark:text-gray-400">Paste text or upload a document to detect plagiarism</span>
@@ -117,10 +119,14 @@
 
           <div class="flex items-center space-x-3">
             <button id="themeToggle" class="p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm" title="Toggle theme">
-              <svg id="themeIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/></svg>
+              <svg id="themeIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+              </svg>
             </button>
             <button id="openHistoryBtn" class="p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm" title="Open history">
-              <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V3z"/></svg>
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V3z"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -129,7 +135,7 @@
       <!-- Body -->
       <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- Left column: input area (spans 2 cols on large screens) -->
+        <!-- Left column: input area -->
         <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
           <div class="flex items-start justify-between">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
@@ -144,7 +150,9 @@
             <!-- Drag-drop zone / file input -->
             <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200">
               <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" />
-              <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 018 0v8"/></svg>
+              <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 018 0v8"/>
+              </svg>
               <span id="dropLabel">Drag & drop or click to upload</span>
             </label>
 
@@ -255,7 +263,6 @@
     }
 
     function showResultFromHistory(it) {
-      // Renders the saved result object
       renderResults(it.data);
       summaryBox.innerHTML = `<div class="text-sm font-medium">${it.label}</div><div class="text-xs text-gray-500">${it.date}</div>`;
     }
@@ -398,113 +405,33 @@
       }
     }
 
-    /* Render results function (UPDATED FOR TRANSLATION INFO) */
-   function renderResults(data) {
-  resultsPanel.classList.remove('hidden');
-  resultsContent.innerHTML = '';
+    /* Render results function (translation info + URL/TITLE) */
+    function renderResults(data) {
+      resultsPanel.classList.remove('hidden');
+      resultsContent.innerHTML = '';
 
-  // overall badge
-  const score = data.overall_score ?? 0;
-  let colorClass = 'text-green-600 bg-green-50';
-  if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
-  else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50';
-  overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
-  overallBadge.textContent = `${score}% — ${data.message || ''}`;
+      // overall badge
+      const score = data.overall_score ?? 0;
+      let colorClass = 'text-green-600 bg-green-50';
+      if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
+      else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50';
+      overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
+      overallBadge.textContent = `${score}% — ${data.message || ''}`;
 
-  // translation info from backend
-  const usedTranslation = !!data.used_translation;
-  const requestedLang = data.requested_language || 'auto';
-  const targetLang = data.target_language || 'en';
+      // translation info from backend
+      const usedTranslation = !!data.used_translation;
+      const requestedLang = data.requested_language || 'auto';
+      const targetLang = data.target_language || 'en';
 
-  let translationNote = '';
-  if (usedTranslation) {
-    translationNote = `
-      <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
-        Text was translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> before analysis
-        (requested: <code>${escapeHtml(requestedLang)}</code>).
-      </div>
-    `;
-  }
-
-  summaryBox.innerHTML = `
-    <div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div>
-    <div class="text-xs text-gray-500">${data.message || ''}</div>
-    ${translationNote}
-  `;
-
-  // details (chunks)
-  const details = data.details || [];
-  details.forEach((d, idx) => {
-    const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity*100) : (d.best_similarity || 0);
-    // choose heat class
-    let heatClass = 'heat-0';
-    if (sim > 60) heatClass = 'heat-2';
-    else if (sim > 30) heatClass = 'heat-1';
-    // create card
-    const card = document.createElement('div');
-    card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
-    // header row with small bar
-    card.innerHTML = `
-      <div class="flex items-center justify-between">
-        <div class="text-sm font-medium">Chunk ${idx+1}</div>
-        <div class="text-sm font-semibold">${sim.toFixed(2)}%</div>
-      </div>
-      <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || d.sentence || '')}</div>
-    `;
-
-    // matches
-    if (d.matches && d.matches.length) {
-      const ul = document.createElement('ul');
-      ul.className = 'mt-3 text-xs list-disc ml-5';
-      d.matches.slice(0,3).forEach(m => {
-        const li = document.createElement('li');
-
-        const sourceLabel = m.title || m.url || m.source || 'source';
-        const safeLabel = escapeHtml(sourceLabel);
-        const safeUrl = m.url ? escapeHtml(m.url) : null;
-        const snippet = escapeHtml((m.matched_text || '').slice(0, 120)) + '...';
-        const simPct = (m.similarity * 100).toFixed(2);
-
-        if (safeUrl) {
-          li.innerHTML = `
-            <strong>
-              <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">
-                ${safeLabel}
-              </a>
-            </strong>
-            — ${simPct}%<br>
-            <em class="text-xs text-gray-500">${snippet}</em>
-          `;
-        } else {
-          li.innerHTML = `
-            <strong>${safeLabel}</strong> — ${simPct}%<br>
-            <em class="text-xs text-gray-500">${snippet}</em>
-          `;
-        }
-
-        ul.appendChild(li);
-      });
-      card.appendChild(ul);
-    } else {
-      const p = document.createElement('p');
-      p.className = 'mt-3 text-xs text-gray-500';
-      p.textContent = 'No strong matches found for this chunk.';
-      card.appendChild(p);
-    }
-
-    // add small heat bar
-    const heat = document.createElement('div');
-    heat.className = `mt-3 h-2 rounded-full ${heatClass}`;
-    heat.style.width = Math.min(100, Math.max(6, sim)) + '%';
-    card.appendChild(heat);
-
-    resultsContent.appendChild(card);
-  });
-
-  // scroll to results
-  resultsPanel.scrollIntoView({ behavior: 'smooth' });
-}
-
+      let translationNote = '';
+      if (usedTranslation) {
+        translationNote = `
+          <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
+            Text was translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> before analysis
+            (requested: <code>${escapeHtml(requestedLang)}</code>).
+          </div>
+        `;
+      }
 
       summaryBox.innerHTML = `
         <div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div>
@@ -520,10 +447,10 @@
         let heatClass = 'heat-0';
         if (sim > 60) heatClass = 'heat-2';
         else if (sim > 30) heatClass = 'heat-1';
-        // create card
+
         const card = document.createElement('div');
         card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
-        // header row with small bar
+
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <div class="text-sm font-medium">Chunk ${idx+1}</div>
@@ -531,13 +458,36 @@
           </div>
           <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || d.sentence || '')}</div>
         `;
-        // matches
+
         if (d.matches && d.matches.length) {
           const ul = document.createElement('ul');
           ul.className = 'mt-3 text-xs list-disc ml-5';
           d.matches.slice(0,3).forEach(m => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${escapeHtml(m.source || 'source')}</strong> — ${(m.similarity*100).toFixed(2)}%<br><em class="text-xs text-gray-500">${escapeHtml((m.matched_text||'').slice(0,120))}...</em>`;
+
+            const sourceLabel = m.title || m.url || m.source || 'source';
+            const safeLabel = escapeHtml(sourceLabel);
+            const safeUrl = m.url ? escapeHtml(m.url) : null;
+            const snippet = escapeHtml((m.matched_text || '').slice(0, 120)) + '...';
+            const simPct = (m.similarity * 100).toFixed(2);
+
+            if (safeUrl) {
+              li.innerHTML = `
+                <strong>
+                  <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">
+                    ${safeLabel}
+                  </a>
+                </strong>
+                — ${simPct}%<br>
+                <em class="text-xs text-gray-500">${snippet}</em>
+              `;
+            } else {
+              li.innerHTML = `
+                <strong>${safeLabel}</strong> — ${simPct}%<br>
+                <em class="text-xs text-gray-500">${snippet}</em>
+              `;
+            }
+
             ul.appendChild(li);
           });
           card.appendChild(ul);
@@ -548,7 +498,6 @@
           card.appendChild(p);
         }
 
-        // add small heat bar
         const heat = document.createElement('div');
         heat.className = `mt-3 h-2 rounded-full ${heatClass}`;
         heat.style.width = Math.min(100, Math.max(6, sim)) + '%';
@@ -557,7 +506,6 @@
         resultsContent.appendChild(card);
       });
 
-      // scroll to results
       resultsPanel.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -586,7 +534,6 @@
         }
         setLoading(false);
         alert(`Saved ${j.saved_count || 0} documents to corpus.`);
-        // trigger rebuild
         await rebuildIndex();
       } catch(e) {
         setLoading(false);
@@ -617,16 +564,15 @@
     /* ====== Init & bindings ====== */
     checkTextBtn.addEventListener('click', checkText);
 
-    // initial UI state
     loadHistory();
     fetchCorpusCount();
 
-    // expose some debug shortcuts
     window.__plag_ui = { renderResults, rebuildIndex };
-
   </script>
 </body>
 </html>
+
+
 
 
 
