@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlagAware — AI Plagiarism Detector</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,86 +13,166 @@
           colors: {
             'purple-accent': '#7C3AED',
             'purple-accent-2': '#C084FC',
+            'panel': '#F8FAFF',
           },
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+<body class="bg-gray-50 text-gray-900 font-sans">
 
   <!-- NAVBAR -->
-  <nav class="bg-white dark:bg-gray-800 shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-purple-accent flex items-center justify-center rounded-lg text-white font-bold text-lg">AI</div>
-        <span class="text-xl font-bold">PlagAware</span>
+        <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">
+          AI
+        </div>
+        <div>
+          <div class="font-extrabold text-lg">PlagAware</div>
+          <div class="text-xs text-gray-500">AI Plagiarism Detection</div>
+        </div>
       </div>
-      <div class="space-x-4">
-        <a href="index.html" class="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-accent">Home</a>
-        <a href="dashboard.html" class="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-accent">Dashboard</a>
-        <a href="#about" class="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-accent">About</a>
-        <a href="#contact" class="text-gray-700 dark:text-gray-200 font-medium hover:text-purple-accent">Contact</a>
+      <div class="hidden md:flex items-center gap-4 text-sm">
+        <a href="#features" class="hover:text-purple-accent">Features</a>
+        <a href="#how" class="hover:text-purple-accent">How it works</a>
+        <!-- replace this with your real GitHub repo link -->
+        <a href="https://github.com/your-username/your-repo" class="hover:text-purple-accent">GitHub</a>
+        <a href="dashboard.html" class="px-4 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
+          Open Checker
+        </a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO SECTION -->
-  <section class="max-w-7xl mx-auto px-6 py-20 text-center">
-    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
-      Detect Plagiarism Instantly with AI
-    </h1>
-    <p class="mt-4 text-gray-600 dark:text-gray-300 text-lg md:text-xl">
-      PlagAware scans your documents or pasted text against a growing corpus to ensure originality.
-    </p>
-    <div class="mt-8 flex justify-center gap-4 flex-wrap">
-      <a href="dashboard.html" class="px-6 py-3 rounded-lg bg-purple-accent text-white font-semibold hover:bg-purple-accent-2 transition">Get Started</a>
-      <a href="#about" class="px-6 py-3 rounded-lg border border-purple-accent text-purple-accent font-semibold hover:bg-purple-accent hover:text-white transition">Learn More</a>
+  <!-- HERO -->
+  <section class="max-w-6xl mx-auto px-4 pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+        AI-powered plagiarism detection<br/>
+        for your projects and reports.
+      </h1>
+      <p class="mt-4 text-gray-600 text-sm md:text-base">
+        Paste text in any language, upload documents, or add online sources. PlagAware translates
+        and analyzes your content against a local corpus using semantic embeddings and FAISS.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="dashboard.html" class="px-5 py-2.5 rounded-lg bg-purple-accent text-white text-sm font-semibold hover:opacity-95">
+          Open Plagiarism Checker
+        </a>
+        <a href="#features" class="px-5 py-2.5 rounded-lg border text-sm font-semibold hover:border-purple-accent hover:text-purple-accent">
+          See Features
+        </a>
+      </div>
+      <p class="mt-3 text-xs text-gray-500">
+        Multilingual input · Translation to English before analysis · Built for your university project.
+      </p>
+    </div>
+
+    <!-- Simple preview card -->
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-4 md:p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-sm font-semibold text-gray-700">Scan Preview</div>
+        <span class="text-xs px-2 py-1 rounded-full bg-purple-accent-2/20 text-purple-accent">
+          Demo
+        </span>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-medium text-gray-700">Overall Score</span>
+          <span class="px-2 py-1 rounded-full bg-green-50 text-green-600 text-xs">
+            12% · Mostly original
+          </span>
+        </div>
+        <div class="space-y-2">
+          <div class="p-2 rounded-lg bg-gray-50 border text-[11px]">
+            <div class="flex justify-between mb-1">
+              <span class="font-semibold">Chunk 1</span>
+              <span>15.23%</span>
+            </div>
+            <div class="line-clamp-2 text-gray-600">
+              This is an example of a mostly original paragraph with minor overlap…
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-green-200"></div>
+          </div>
+          <div class="p-2 rounded-lg bg-gray-50 border text-[11px]">
+            <div class="flex justify-between mb-1">
+              <span class="font-semibold">Chunk 2</span>
+              <span>68.10%</span>
+            </div>
+            <div class="line-clamp-2 text-gray-600">
+              This section appears highly similar to an article in the corpus database…
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-red-200"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- FEATURES -->
-  <section id="about" class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-10 text-center">
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition">
-      <div class="text-4xl mb-4">📝</div>
-      <h3 class="text-xl font-semibold mb-2">Text & Document Scans</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm">
-        Paste your text or upload PDF/DOCX/TXT files for instant plagiarism detection.
-      </p>
-    </div>
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition">
-      <div class="text-4xl mb-4">🌐</div>
-      <h3 class="text-xl font-semibold mb-2">Online Corpus</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm">
-        Add web articles or scrape sources to expand your comparison corpus effortlessly.
-      </p>
-    </div>
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="text-xl font-semibold mb-2">Detailed Reports</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm">
-        View chunk-level similarity with heatmaps and comprehensive summaries of your scans.
-      </p>
+  <section id="features" class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-bold mb-4">What you can do with PlagAware</h2>
+    <div class="grid md:grid-cols-3 gap-6 text-sm">
+      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
+        <div class="text-2xl mb-2">📝</div>
+        <div class="font-semibold mb-1">Paste or upload</div>
+        <p class="text-gray-600">
+          Paste up to 10,000 characters or upload PDF, DOCX, or TXT files for analysis in any language.
+        </p>
+      </div>
+      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
+        <div class="text-2xl mb-2">🌐</div>
+        <div class="font-semibold mb-1">Build your corpus</div>
+        <p class="text-gray-600">
+          Add URLs to scrape articles into a local corpus directory powering the similarity search.
+        </p>
+      </div>
+      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
+        <div class="text-2xl mb-2">📊</div>
+        <div class="font-semibold mb-1">Chunk-level results</div>
+        <p class="text-gray-600">
+          View chunk-by-chunk matches, similarity percentages, and highlight high-risk sections.
+        </p>
+      </div>
     </div>
   </section>
 
-  <!-- CALL TO ACTION -->
-  <section class="max-w-7xl mx-auto px-6 py-20 text-center bg-purple-accent-2/10 rounded-xl my-10">
-    <h2 class="text-3xl font-bold text-purple-accent mb-4">Ready to ensure originality?</h2>
-    <a href="dashboard.html" class="px-6 py-3 rounded-lg bg-purple-accent text-white font-semibold hover:bg-purple-accent-2 transition">Scan Now</a>
+  <!-- HOW IT WORKS -->
+  <section id="how" class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-bold mb-4">How it works under the hood</h2>
+    <div class="grid md:grid-cols-2 gap-6 text-sm">
+      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
+        <h3 class="font-semibold mb-1">Embeddings, FAISS & translation</h3>
+        <p class="text-gray-600">
+          Your text is translated to English (if needed), split into chunks, converted into multilingual
+          sentence embeddings, and compared against your corpus using a FAISS index with cosine similarity.
+        </p>
+      </div>
+      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
+        <h3 class="font-semibold mb-1">Local-first design</h3>
+        <p class="text-gray-600">
+          Corpus files and indexes live on your machine or server. Ideal for university projects,
+          offline demos, or privacy-focused setups.
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 py-6 mt-10">
-    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-      <p>© 2025 PlagAware. All rights reserved.</p>
-      <div class="space-x-4 mt-2 md:mt-0">
-        <a href="#contact" class="hover:text-purple-accent">Contact</a>
-        <a href="https://github.com/your-repo" class="hover:text-purple-accent">GitHub</a>
+  <footer class="mt-10 border-t bg-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 gap-2">
+      <span>© 2025 PlagAware · Built for your AI plagiarism detection project</span>
+      <div class="flex gap-4">
+        <a href="dashboard.html" class="hover:text-purple-accent">Open Checker</a>
+        <!-- replace this with your real GitHub repo link -->
+        <a href="https://github.com/your-username/your-repo" class="hover:text-purple-accent">GitHub</a>
       </div>
     </div>
   </footer>
 
 </body>
 </html>
+
