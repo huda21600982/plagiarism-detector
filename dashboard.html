@@ -33,6 +33,29 @@
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
 
+  <!-- TOP NAVBAR -->
+  <nav class="bg-white/90 dark:bg-gray-900/90 border-b dark:border-gray-800 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">
+          AI
+        </div>
+        <div>
+          <div class="font-extrabold text-lg text-gray-900 dark:text-white">PlagAware</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <a href="index.html" class="hidden sm:inline-block px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+          Home
+        </a>
+        <a href="dashboard.html" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
+          Open Checker
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <!-- Layout: Sidebar + Main -->
   <div class="min-h-screen flex">
 
@@ -78,7 +101,7 @@
 
         <div class="flex items-center space-x-4">
           <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-            <label class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language</label>
+            <label class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we’ll translate)</label>
             <select id="languageSelect" class="text-sm bg-transparent outline-none">
               <option value="auto">Detect</option>
               <option value="en">English</option>
@@ -247,9 +270,6 @@
 
     /* ====== Corpus count loader ====== */
     async function fetchCorpusCount() {
-      // attempt to call /rebuild-index statusless to get corpus_count by doing a harmless GET to /rebuild-index requires POST,
-      // instead we'll hit a lightweight approach: call /rebuild-index only if user wants. For initial UI, try to show existing index by asking a small endpoint.
-      // We'll attempt to fetch /rebuild-index with an empty POST to read corpus_count if index exists.
       try {
         const res = await fetch(`${backendUrl}/rebuild-index`, { method: 'POST' });
         const j = await res.json();
@@ -288,6 +308,11 @@
           body: JSON.stringify({ text, language })
         });
         const j = await res.json();
+        if (j.error) {
+          setLoading(false);
+          alert(j.error);
+          return;
+        }
         setLoading(false);
         renderResults(j);
         saveToHistory({ label: 'Text scan', date: new Date().toLocaleString(), data: j });
@@ -358,6 +383,11 @@
       try {
         const language = document.getElementById('languageSelect').value;
         const result = await uploadFileWithProgress(file, language);
+        if (result.error) {
+          setLoading(false);
+          alert(result.error);
+          return;
+        }
         setLoading(false);
         renderResults(result);
         saveToHistory({ label: `File: ${file.name}`, date: new Date().toLocaleString(), data: result });
@@ -368,7 +398,7 @@
       }
     }
 
-    /* Render results function */
+    /* Render results function (UPDATED FOR TRANSLATION INFO) */
     function renderResults(data) {
       resultsPanel.classList.remove('hidden');
       resultsContent.innerHTML = '';
@@ -381,7 +411,26 @@
       overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
       overallBadge.textContent = `${score}% — ${data.message || ''}`;
 
-      summaryBox.innerHTML = `<div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div><div class="text-xs text-gray-500">${data.message}</div>`;
+      // translation info from backend
+      const usedTranslation = !!data.used_translation;
+      const requestedLang = data.requested_language || 'auto';
+      const targetLang = data.target_language || 'en';
+
+      let translationNote = '';
+      if (usedTranslation) {
+        translationNote = `
+          <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
+            Text was translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> before analysis
+            (requested: <code>${escapeHtml(requestedLang)}</code>).
+          </div>
+        `;
+      }
+
+      summaryBox.innerHTML = `
+        <div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div>
+        <div class="text-xs text-gray-500">${data.message || ''}</div>
+        ${translationNote}
+      `;
 
       // details (chunks)
       const details = data.details || [];
@@ -408,7 +457,7 @@
           ul.className = 'mt-3 text-xs list-disc ml-5';
           d.matches.slice(0,3).forEach(m => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${escapeHtml(m.source || m.source || 'source')}</strong> — ${(m.similarity*100).toFixed(2)}%<br><em class="text-xs text-gray-500">${escapeHtml((m.matched_text||'').slice(0,120))}...</em>`;
+            li.innerHTML = `<strong>${escapeHtml(m.source || 'source')}</strong> — ${(m.similarity*100).toFixed(2)}%<br><em class="text-xs text-gray-500">${escapeHtml((m.matched_text||'').slice(0,120))}...</em>`;
             ul.appendChild(li);
           });
           card.appendChild(ul);
@@ -450,7 +499,11 @@
           body: JSON.stringify({ urls })
         });
         const j = await res.json();
-        // optionally show saved paths
+        if (j.error) {
+          setLoading(false);
+          alert(j.error);
+          return;
+        }
         setLoading(false);
         alert(`Saved ${j.saved_count || 0} documents to corpus.`);
         // trigger rebuild
@@ -494,6 +547,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
