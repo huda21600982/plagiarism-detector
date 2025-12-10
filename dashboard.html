@@ -21,12 +21,10 @@
     }
   </script>
   <style>
-    /* small utility to show heat colors */
-    .heat-0 { background: linear-gradient(90deg,#ecfccb,#86efac); } /* green */
-    .heat-1 { background: linear-gradient(90deg,#fef9c3,#facc15); } /* yellow */
-    .heat-2 { background: linear-gradient(90deg,#fee2e2,#f43f5e); } /* red */
+    .heat-0 { background: linear-gradient(90deg,#ecfccb,#86efac); }
+    .heat-1 { background: linear-gradient(90deg,#fef9c3,#facc15); }
+    .heat-2 { background: linear-gradient(90deg,#fee2e2,#f43f5e); }
     .chunk-highlight { background: rgba(124,58,237,0.12); padding: 2px 4px; border-radius: 4px; }
-    /* small scrollbar style */
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
   </style>
@@ -41,17 +39,21 @@
           AI
         </div>
         <div>
-          <div class="font-extrabold text-lg text-gray-900 dark:text-white">PlagAware</div>
-          <div class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</div>
+          <div id="appName" class="font-extrabold text-lg text-gray-900 dark:text-white">PlagAware</div>
+          <div id="appTagline" class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-sm">
-        <a href="index.html" class="hidden sm:inline-block px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <a id="navHome" href="index.html" class="hidden sm:inline-block px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
           Home
         </a>
-        <a href="dashboard.html" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
+        <a id="navOpenChecker" href="dashboard.html" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
           Open Checker
         </a>
+        <!-- UI language toggle -->
+        <button id="uiLangToggle" class="px-3 py-1 rounded-lg border text-xs">
+          AR
+        </button>
       </div>
     </div>
   </nav>
@@ -65,8 +67,8 @@
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-lg bg-purple-accent flex items-center justify-center text-white font-bold">AI</div>
           <div>
-            <h1 class="text-lg font-extrabold text-gray-900 dark:text-white">PlagAware</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</p>
+            <h1 id="sidebarAppName" class="text-lg font-extrabold text-gray-900 dark:text-white">PlagAware</h1>
+            <p id="sidebarAppTagline" class="text-xs text-gray-500 dark:text-gray-400">AI Plagiarism Dashboard</p>
           </div>
         </div>
 
@@ -77,12 +79,12 @@
         </nav>
 
         <div class="mt-8">
-          <p class="text-xs text-gray-500 dark:text-gray-400">Corpus size:</p>
+          <p id="corpusSizeLabel" class="text-xs text-gray-500 dark:text-gray-400">Corpus size:</p>
           <div id="corpusCount" class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-200">—</div>
           <button id="rebuildBtn" class="mt-3 w-full px-3 py-2 bg-purple-accent text-white rounded-lg text-sm">Rebuild Index</button>
         </div>
 
-        <div class="mt-8 text-xs text-gray-400">Built for your university project • Local only</div>
+        <div id="builtNote" class="mt-8 text-xs text-gray-400">Built for your university project • Local only</div>
       </div>
     </aside>
 
@@ -97,13 +99,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Scan · New</h2>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Paste text or upload a document to detect plagiarism</span>
+          <h2 id="scanTitle" class="text-xl font-bold text-gray-900 dark:text-white">Scan · New</h2>
+          <span id="scanSubtitle" class="text-sm text-gray-500 dark:text-gray-400">Paste text or upload a document to detect plagiarism</span>
         </div>
 
         <div class="flex items-center space-x-4">
           <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-            <label class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we’ll translate)</label>
+            <label id="langLabel" class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we’ll translate)</label>
             <select id="languageSelect" class="text-sm bg-transparent outline-none">
               <option value="auto">Detect</option>
               <option value="en">English</option>
@@ -138,8 +140,8 @@
         <!-- Left column: input area -->
         <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
           <div class="flex items-start justify-between">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Up to 10,000 chars</div>
+            <h3 id="pasteTextLabel" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
+            <div id="pasteLimitLabel" class="text-sm text-gray-500 dark:text-gray-400">Up to 10,000 chars</div>
           </div>
 
           <textarea id="inputText" maxlength="10000" rows="10" class="w-full mt-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-900 text-sm" placeholder="Paste your text here..."></textarea>
@@ -163,32 +165,32 @@
 
           <!-- Corpus Scraper block -->
           <div class="mt-5 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border dark:border-gray-700">
-            <label class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
+            <label id="scraperLabel" class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
             <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border dark:bg-gray-900 text-sm" placeholder="https://example.com/article"></textarea>
             <div class="mt-3 flex gap-3">
               <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white">Add to Corpus</button>
               <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border">Rebuild Index</button>
             </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Adding URLs will attempt to scrape and save articles to the corpus directory on the server.</p>
+            <p id="scraperHelp" class="mt-2 text-xs text-gray-500 dark:text-gray-400">Adding URLs will attempt to scrape and save articles to the corpus directory on the server.</p>
           </div>
         </section>
 
         <!-- Right column: results & history quick view -->
         <aside class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow space-y-4">
           <div>
-            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Scan Summary</h4>
+            <h4 id="scanSummaryLabel" class="text-sm font-semibold text-gray-800 dark:text-gray-100">Scan Summary</h4>
             <div id="summaryBox" class="mt-3 text-sm text-gray-600 dark:text-gray-300">No scan yet</div>
           </div>
 
           <div>
-            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Recent Scans</h4>
+            <h4 id="recentScansLabel" class="text-sm font-semibold text-gray-800 dark:text-gray-100">Recent Scans</h4>
             <ul id="historyList" class="mt-3 space-y-2 max-h-48 overflow-auto text-sm"></ul>
           </div>
 
           <div>
-            <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Corpus Controls</h4>
+            <h4 id="corpusControlsLabel" class="text-sm font-semibold text-gray-800 dark:text-gray-100">Corpus Controls</h4>
             <div class="mt-2 space-y-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400">Corpus count: <span id="sidebarCorpusCount">—</span></div>
+              <div id="corpusCountLabel" class="text-xs text-gray-500 dark:text-gray-400">Corpus count: <span id="sidebarCorpusCount">—</span></div>
               <button id="openCorpusBtn" class="w-full mt-2 px-3 py-2 bg-transparent border rounded text-sm">Manage Corpus</button>
             </div>
           </div>
@@ -199,7 +201,7 @@
       <!-- RESULTS FULL WIDTH -->
       <section id="resultsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Scan Results</h3>
+          <h3 id="resultsHeader" class="text-lg font-semibold">Scan Results</h3>
           <div id="overallBadge" class="text-sm font-semibold px-3 py-1 rounded-lg">—</div>
         </div>
 
@@ -211,8 +213,144 @@
 
   <script>
     /* ====== Configuration ====== */
-    const backendUrl = "http://127.0.0.1:5000"; // keep same origin for local testing
+    const backendUrl = "http://127.0.0.1:5000";
     const SCORE_THRESHOLDS = { low:30, med:60 };
+    const UI_LANG_KEY = "ui_lang";
+
+    /* ====== UI language strings ====== */
+    const uiStrings = {
+      en: {
+        appName: "PlagAware",
+        appTagline: "AI Plagiarism Dashboard",
+        home: "Home",
+        openChecker: "Open Checker",
+        sidebarScan: "Scan",
+        sidebarCorpus: "Corpus",
+        sidebarHistory: "History",
+        corpusSizeLabel: "Corpus size:",
+        builtNote: "Built for your university project \u2022 Local only",
+        scanTitle: "Scan \u00b7 New",
+        scanSubtitle: "Paste text or upload a document to detect plagiarism",
+        langLabel: "Language (we\u2019ll translate)",
+        pasteTextLabel: "Paste text",
+        pasteLimitLabel: "Up to 10,000 chars",
+        pastePlaceholder: "Paste your text here...",
+        checkTextBtn: "Check Text",
+        dropLabel: "Drag & drop or click to upload",
+        scraperLabel: "Add online sources to corpus (one URL per line)",
+        scraperAddBtn: "Add to Corpus",
+        scraperRebuildBtn: "Rebuild Index",
+        scraperHelp: "Adding URLs will attempt to scrape and save articles to the corpus directory on the server.",
+        scanSummaryLabel: "Scan Summary",
+        recentScansLabel: "Recent Scans",
+        corpusControlsLabel: "Corpus Controls",
+        corpusCountLabelPrefix: "Corpus count:",
+        manageCorpusBtn: "Manage Corpus",
+        resultsHeader: "Scan Results",
+        noScanYet: "No scan yet",
+        noScansHistory: "No scans yet"
+      },
+      ar: {
+        appName: "بلاج أويـر",
+        appTagline: "لوحة كشف الانتحال بالذكاء الاصطناعي",
+        home: "الصفحة الرئيسية",
+        openChecker: "فتح أداة الفحص",
+        sidebarScan: "فحص",
+        sidebarCorpus: "المراجع",
+        sidebarHistory: "السجل",
+        corpusSizeLabel: "حجم المستودع:",
+        builtNote: "مصمم لمشروعك الجامعي \u2022 يعمل محليًا",
+        scanTitle: "فحص جديد",
+        scanSubtitle: "ألصق النص أو ارفع ملفًا لاكتشاف الانتحال",
+        langLabel: "لغة النص (سيتم الترجمة)",
+        pasteTextLabel: "ألصق النص",
+        pasteLimitLabel: "حتى ١٠٬٠٠٠ حرف",
+        pastePlaceholder: "ألصق النص هنا...",
+        checkTextBtn: "فحص النص",
+        dropLabel: "اسحب وأفلت أو اضغط لرفع ملف",
+        scraperLabel: "أضف مصادر من الإنترنت (رابط في كل سطر)",
+        scraperAddBtn: "إضافة إلى المستودع",
+        scraperRebuildBtn: "إعادة بناء الفهرس",
+        scraperHelp: "سيتم جلب المقالات من الروابط وحفظها في مجلد المستودع على الخادم.",
+        scanSummaryLabel: "ملخص الفحص",
+        recentScansLabel: "الفحوصات الأخيرة",
+        corpusControlsLabel: "إدارة المستودع",
+        corpusCountLabelPrefix: "عدد المقاطع:",
+        manageCorpusBtn: "إدارة المستودع",
+        resultsHeader: "نتائج الفحص",
+        noScanYet: "لا يوجد فحص بعد",
+        noScansHistory: "لا توجد فحوصات بعد"
+      }
+    };
+
+    function applyUiLanguage(lang) {
+      const strings = uiStrings[lang] || uiStrings.en;
+
+      // document direction & lang
+      document.documentElement.lang = (lang === "ar") ? "ar" : "en";
+      document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+
+      // navbar
+      document.getElementById("appName").textContent = strings.appName;
+      document.getElementById("appTagline").textContent = strings.appTagline;
+      document.getElementById("sidebarAppName").textContent = strings.appName;
+      document.getElementById("sidebarAppTagline").textContent = strings.appTagline;
+      document.getElementById("navHome").textContent = strings.home;
+      document.getElementById("navOpenChecker").textContent = strings.openChecker;
+
+      // sidebar
+      document.getElementById("nav_scan").textContent = strings.sidebarScan;
+      document.getElementById("nav_corpus").textContent = strings.sidebarCorpus;
+      document.getElementById("nav_history").textContent = strings.sidebarHistory;
+      document.getElementById("corpusSizeLabel").textContent = strings.corpusSizeLabel;
+      document.getElementById("builtNote").textContent = strings.builtNote;
+      document.getElementById("rebuildBtn").textContent = strings.scraperRebuildBtn;
+
+      // header
+      document.getElementById("scanTitle").textContent = strings.scanTitle;
+      document.getElementById("scanSubtitle").textContent = strings.scanSubtitle;
+      document.getElementById("langLabel").textContent = strings.langLabel;
+
+      // input section
+      document.getElementById("pasteTextLabel").textContent = strings.pasteTextLabel;
+      document.getElementById("pasteLimitLabel").textContent = strings.pasteLimitLabel;
+      document.getElementById("inputText").placeholder = strings.pastePlaceholder;
+      document.getElementById("checkTextBtn").textContent = strings.checkTextBtn;
+      document.getElementById("dropLabel").textContent = strings.dropLabel;
+
+      // scraper
+      document.getElementById("scraperLabel").textContent = strings.scraperLabel;
+      document.getElementById("scrapeBtn").textContent = strings.scraperAddBtn;
+      document.getElementById("rebuildSmallBtn").textContent = strings.scraperRebuildBtn;
+      document.getElementById("scraperHelp").textContent = strings.scraperHelp;
+
+      // right panel
+      document.getElementById("scanSummaryLabel").textContent = strings.scanSummaryLabel;
+      document.getElementById("recentScansLabel").textContent = strings.recentScansLabel;
+      document.getElementById("corpusControlsLabel").textContent = strings.corpusControlsLabel;
+      document.getElementById("corpusCountLabel").innerHTML =
+        `${strings.corpusCountLabelPrefix}: <span id="sidebarCorpusCount">${document.getElementById("sidebarCorpusCount").textContent}</span>`;
+      document.getElementById("openCorpusBtn").textContent = strings.manageCorpusBtn;
+
+      // results header
+      document.getElementById("resultsHeader").textContent = strings.resultsHeader;
+
+      // scan summary initial text if untouched
+      if (summaryBox.textContent.trim() === "No scan yet" ||
+          summaryBox.textContent.trim() === uiStrings.en.noScanYet ||
+          summaryBox.textContent.trim() === uiStrings.ar.noScanYet) {
+        summaryBox.textContent = strings.noScanYet;
+      }
+
+      // history empty state
+      if (!historyList.children.length) {
+        historyList.innerHTML = `<li class="text-xs text-gray-400">${strings.noScansHistory}</li>`;
+      }
+
+      // toggle button label (shows target language)
+      const toggleBtn = document.getElementById("uiLangToggle");
+      toggleBtn.textContent = (lang === "ar") ? "EN" : "AR";
+    }
 
     /* ====== DOM refs ====== */
     const inputText = document.getElementById('inputText');
@@ -234,9 +372,9 @@
     const rebuildBtn = document.getElementById('rebuildBtn');
     const rebuildSmallBtn = document.getElementById('rebuildSmallBtn');
     const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
+    const uiLangToggle = document.getElementById('uiLangToggle');
 
-    /* ====== keep history in localStorage ====== */
+    /* ====== History ====== */
     function loadHistory() {
       const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
       renderHistory(h);
@@ -250,8 +388,11 @@
     }
     function renderHistory(h) {
       historyList.innerHTML = '';
+      const lang = localStorage.getItem(UI_LANG_KEY) || 'en';
+      const strings = uiStrings[lang] || uiStrings.en;
+
       if (!h.length) {
-        historyList.innerHTML = '<li class="text-xs text-gray-400">No scans yet</li>';
+        historyList.innerHTML = `<li class="text-xs text-gray-400">${strings.noScansHistory}</li>`;
         return;
       }
       h.forEach((it, idx) => {
@@ -273,6 +414,14 @@
       document.documentElement.classList.toggle('dark');
       const isDark = document.documentElement.classList.contains('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    /* ====== UI language toggle ====== */
+    uiLangToggle.addEventListener('click', () => {
+      const current = localStorage.getItem(UI_LANG_KEY) || 'en';
+      const next = current === 'en' ? 'ar' : 'en';
+      localStorage.setItem(UI_LANG_KEY, next);
+      applyUiLanguage(next);
     });
 
     /* ====== Corpus count loader ====== */
@@ -410,7 +559,6 @@
       resultsPanel.classList.remove('hidden');
       resultsContent.innerHTML = '';
 
-      // overall badge
       const score = data.overall_score ?? 0;
       let colorClass = 'text-green-600 bg-green-50';
       if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
@@ -418,7 +566,6 @@
       overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
       overallBadge.textContent = `${score}% — ${data.message || ''}`;
 
-      // translation info from backend
       const usedTranslation = !!data.used_translation;
       const requestedLang = data.requested_language || 'auto';
       const targetLang = data.target_language || 'en';
@@ -439,11 +586,9 @@
         ${translationNote}
       `;
 
-      // details (chunks)
       const details = data.details || [];
       details.forEach((d, idx) => {
         const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity*100) : (d.best_similarity || 0);
-        // choose heat class
         let heatClass = 'heat-0';
         if (sim > 60) heatClass = 'heat-2';
         else if (sim > 30) heatClass = 'heat-1';
@@ -509,7 +654,6 @@
       resultsPanel.scrollIntoView({ behavior: 'smooth' });
     }
 
-    /* Utility: escape HTML */
     function escapeHtml(s='') {
       return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
     }
@@ -560,10 +704,11 @@
 
     rebuildBtn.addEventListener('click', rebuildIndex);
     rebuildSmallBtn.addEventListener('click', rebuildIndex);
-
-    /* ====== Init & bindings ====== */
     checkTextBtn.addEventListener('click', checkText);
 
+    // initial UI state
+    const initialLang = localStorage.getItem(UI_LANG_KEY) || 'en';
+    applyUiLanguage(initialLang);
     loadHistory();
     fetchCorpusCount();
 
@@ -571,6 +716,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
