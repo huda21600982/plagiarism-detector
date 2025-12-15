@@ -11,7 +11,7 @@
       theme: {
         extend: {
           colors: {
-            'purple-accent': '#7C3AED', /* main purple */
+            'purple-accent': '#7C3AED',
             'purple-accent-2': '#C084FC',
             'panel': '#F8FAFF',
           },
@@ -50,6 +50,10 @@
         <a id="navOpenChecker" href="dashboard.html" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
           Open Checker
         </a>
+
+        <!-- current user badge -->
+        <span id="currentUserBadge" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-200"></span>
+
         <!-- UI language toggle -->
         <button id="uiLangToggle" class="px-3 py-1 rounded-lg border text-xs">
           AR
@@ -205,6 +209,11 @@
           <div id="overallBadge" class="text-sm font-semibold px-3 py-1 rounded-lg">—</div>
         </div>
 
+        <!-- Summary card -->
+        <div id="resultsSummaryCard"
+             class="mt-4 p-4 rounded-lg bg-panel dark:bg-gray-900/70 border border-purple-accent/10 text-sm hidden">
+        </div>
+
         <div id="resultsContent" class="mt-4 grid grid-cols-1 gap-4"></div>
       </section>
 
@@ -286,11 +295,9 @@
     function applyUiLanguage(lang) {
       const strings = uiStrings[lang] || uiStrings.en;
 
-      // document direction & lang
       document.documentElement.lang = (lang === "ar") ? "ar" : "en";
       document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
 
-      // navbar
       document.getElementById("appName").textContent = strings.appName;
       document.getElementById("appTagline").textContent = strings.appTagline;
       document.getElementById("sidebarAppName").textContent = strings.appName;
@@ -298,7 +305,6 @@
       document.getElementById("navHome").textContent = strings.home;
       document.getElementById("navOpenChecker").textContent = strings.openChecker;
 
-      // sidebar
       document.getElementById("nav_scan").textContent = strings.sidebarScan;
       document.getElementById("nav_corpus").textContent = strings.sidebarCorpus;
       document.getElementById("nav_history").textContent = strings.sidebarHistory;
@@ -306,25 +312,21 @@
       document.getElementById("builtNote").textContent = strings.builtNote;
       document.getElementById("rebuildBtn").textContent = strings.scraperRebuildBtn;
 
-      // header
       document.getElementById("scanTitle").textContent = strings.scanTitle;
       document.getElementById("scanSubtitle").textContent = strings.scanSubtitle;
       document.getElementById("langLabel").textContent = strings.langLabel;
 
-      // input section
       document.getElementById("pasteTextLabel").textContent = strings.pasteTextLabel;
       document.getElementById("pasteLimitLabel").textContent = strings.pasteLimitLabel;
       document.getElementById("inputText").placeholder = strings.pastePlaceholder;
       document.getElementById("checkTextBtn").textContent = strings.checkTextBtn;
       document.getElementById("dropLabel").textContent = strings.dropLabel;
 
-      // scraper
       document.getElementById("scraperLabel").textContent = strings.scraperLabel;
       document.getElementById("scrapeBtn").textContent = strings.scraperAddBtn;
       document.getElementById("rebuildSmallBtn").textContent = strings.scraperRebuildBtn;
       document.getElementById("scraperHelp").textContent = strings.scraperHelp;
 
-      // right panel
       document.getElementById("scanSummaryLabel").textContent = strings.scanSummaryLabel;
       document.getElementById("recentScansLabel").textContent = strings.recentScansLabel;
       document.getElementById("corpusControlsLabel").textContent = strings.corpusControlsLabel;
@@ -332,22 +334,18 @@
         `${strings.corpusCountLabelPrefix}: <span id="sidebarCorpusCount">${document.getElementById("sidebarCorpusCount").textContent}</span>`;
       document.getElementById("openCorpusBtn").textContent = strings.manageCorpusBtn;
 
-      // results header
       document.getElementById("resultsHeader").textContent = strings.resultsHeader;
 
-      // scan summary initial text if untouched
       if (summaryBox.textContent.trim() === "No scan yet" ||
           summaryBox.textContent.trim() === uiStrings.en.noScanYet ||
           summaryBox.textContent.trim() === uiStrings.ar.noScanYet) {
         summaryBox.textContent = strings.noScanYet;
       }
 
-      // history empty state
       if (!historyList.children.length) {
         historyList.innerHTML = `<li class="text-xs text-gray-400">${strings.noScansHistory}</li>`;
       }
 
-      // toggle button label (shows target language)
       const toggleBtn = document.getElementById("uiLangToggle");
       toggleBtn.textContent = (lang === "ar") ? "EN" : "AR";
     }
@@ -374,16 +372,29 @@
     const themeToggle = document.getElementById('themeToggle');
     const uiLangToggle = document.getElementById('uiLangToggle');
 
+    /* ====== current user & per-user history ====== */
+    const currentUser = localStorage.getItem('current_user') || 'Guest';
+    const historyKey = `scan_history_${currentUser}`;
+    const currentUserBadge = document.getElementById('currentUserBadge');
+    if (currentUserBadge) {
+      if (currentUser === 'Guest') {
+        currentUserBadge.textContent = 'Guest (not logged in)';
+      } else {
+        currentUserBadge.textContent = `Signed in as ${currentUser}`;
+      }
+      currentUserBadge.classList.remove('hidden');
+    }
+
     /* ====== History ====== */
     function loadHistory() {
-      const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
+      const h = JSON.parse(localStorage.getItem(historyKey) || '[]');
       renderHistory(h);
     }
     function saveToHistory(item) {
-      const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
+      const h = JSON.parse(localStorage.getItem(historyKey) || '[]');
       h.unshift(item);
       if (h.length > 25) h.pop();
-      localStorage.setItem('scan_history', JSON.stringify(h));
+      localStorage.setItem(historyKey, JSON.stringify(h));
       renderHistory(h);
     }
     function renderHistory(h) {
@@ -512,210 +523,8 @@
 
         xhr.onerror = function() { uploadProgress.classList.add('hidden'); reject(new Error('Network error')); };
         xhr.send(fd);
-      });
-    }
 
-    /* Dropzone handlers */
-    dropZone.addEventListener('click', ()=> fileInput.click());
-    dropZone.addEventListener('dragover', (e)=> { e.preventDefault(); dropZone.classList.add('ring-2','ring-purple-accent/30'); });
-    dropZone.addEventListener('dragleave', ()=> { dropZone.classList.remove('ring-2','ring-purple-accent/30'); });
-    dropZone.addEventListener('drop', async (e)=> {
-      e.preventDefault();
-      dropZone.classList.remove('ring-2','ring-purple-accent/30');
-      const f = e.dataTransfer.files[0];
-      if (!f) return;
-      dropLabel.textContent = f.name;
-      await handleFileUpload(f);
-    });
-    fileInput.addEventListener('change', async ()=> {
-      const f = fileInput.files[0];
-      if (!f) return;
-      dropLabel.textContent = f.name;
-      await handleFileUpload(f);
-    });
 
-    async function handleFileUpload(file) {
-      setLoading(true, 'Uploading file & scanning...');
-      try {
-        const language = document.getElementById('languageSelect').value;
-        const result = await uploadFileWithProgress(file, language);
-        if (result.error) {
-          setLoading(false);
-          alert(result.error);
-          return;
-        }
-        setLoading(false);
-        renderResults(result);
-        saveToHistory({ label: `File: ${file.name}`, date: new Date().toLocaleString(), data: result });
-      } catch(e) {
-        setLoading(false);
-        alert('Upload or scan failed: ' + (e.message || e));
-        console.error(e);
-      }
-    }
-
-    /* Render results function (translation info + URL/TITLE) */
-    function renderResults(data) {
-      resultsPanel.classList.remove('hidden');
-      resultsContent.innerHTML = '';
-
-      const score = data.overall_score ?? 0;
-      let colorClass = 'text-green-600 bg-green-50';
-      if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
-      else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50';
-      overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
-      overallBadge.textContent = `${score}% — ${data.message || ''}`;
-
-      const usedTranslation = !!data.used_translation;
-      const requestedLang = data.requested_language || 'auto';
-      const targetLang = data.target_language || 'en';
-
-      let translationNote = '';
-      if (usedTranslation) {
-        translationNote = `
-          <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
-            Text was translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> before analysis
-            (requested: <code>${escapeHtml(requestedLang)}</code>).
-          </div>
-        `;
-      }
-
-      summaryBox.innerHTML = `
-        <div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div>
-        <div class="text-xs text-gray-500">${data.message || ''}</div>
-        ${translationNote}
-      `;
-
-      const details = data.details || [];
-      details.forEach((d, idx) => {
-        const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity*100) : (d.best_similarity || 0);
-        let heatClass = 'heat-0';
-        if (sim > 60) heatClass = 'heat-2';
-        else if (sim > 30) heatClass = 'heat-1';
-
-        const card = document.createElement('div');
-        card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
-
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-medium">Chunk ${idx+1}</div>
-            <div class="text-sm font-semibold">${sim.toFixed(2)}%</div>
-          </div>
-          <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || d.sentence || '')}</div>
-        `;
-
-        if (d.matches && d.matches.length) {
-          const ul = document.createElement('ul');
-          ul.className = 'mt-3 text-xs list-disc ml-5';
-          d.matches.slice(0,3).forEach(m => {
-            const li = document.createElement('li');
-
-            const sourceLabel = m.title || m.url || m.source || 'source';
-            const safeLabel = escapeHtml(sourceLabel);
-            const safeUrl = m.url ? escapeHtml(m.url) : null;
-            const snippet = escapeHtml((m.matched_text || '').slice(0, 120)) + '...';
-            const simPct = (m.similarity * 100).toFixed(2);
-
-            if (safeUrl) {
-              li.innerHTML = `
-                <strong>
-                  <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">
-                    ${safeLabel}
-                  </a>
-                </strong>
-                — ${simPct}%<br>
-                <em class="text-xs text-gray-500">${snippet}</em>
-              `;
-            } else {
-              li.innerHTML = `
-                <strong>${safeLabel}</strong> — ${simPct}%<br>
-                <em class="text-xs text-gray-500">${snippet}</em>
-              `;
-            }
-
-            ul.appendChild(li);
-          });
-          card.appendChild(ul);
-        } else {
-          const p = document.createElement('p');
-          p.className = 'mt-3 text-xs text-gray-500';
-          p.textContent = 'No strong matches found for this chunk.';
-          card.appendChild(p);
-        }
-
-        const heat = document.createElement('div');
-        heat.className = `mt-3 h-2 rounded-full ${heatClass}`;
-        heat.style.width = Math.min(100, Math.max(6, sim)) + '%';
-        card.appendChild(heat);
-
-        resultsContent.appendChild(card);
-      });
-
-      resultsPanel.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function escapeHtml(s='') {
-      return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
-    }
-
-    /* ====== Corpus & Scrape handlers ====== */
-    scrapeBtn.addEventListener('click', async () => {
-      const raw = urlList.value.trim();
-      if (!raw) return alert('Enter at least one URL (newline separated).');
-      const urls = raw.split(/\n+/).map(u=>u.trim()).filter(Boolean);
-      setLoading(true, 'Scraping sources...');
-      try {
-        const res = await fetch(`${backendUrl}/scrape`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ urls })
-        });
-        const j = await res.json();
-        if (j.error) {
-          setLoading(false);
-          alert(j.error);
-          return;
-        }
-        setLoading(false);
-        alert(`Saved ${j.saved_count || 0} documents to corpus.`);
-        await rebuildIndex();
-      } catch(e) {
-        setLoading(false);
-        alert('Scrape failed. See console.');
-        console.error(e);
-      }
-    });
-
-    async function rebuildIndex() {
-      try {
-        setLoading(true, 'Rebuilding index...');
-        const res = await fetch(`${backendUrl}/rebuild-index`, { method: 'POST' });
-        const j = await res.json();
-        setLoading(false);
-        corpusCount.textContent = `${j.corpus_count ?? 0} chunks`;
-        sidebarCorpusCount.textContent = `${j.corpus_count ?? 0}`;
-        alert('Index rebuilt. Corpus size: ' + (j.corpus_count || 0));
-      } catch(e) {
-        setLoading(false);
-        alert('Rebuild failed.');
-        console.error(e);
-      }
-    }
-
-    rebuildBtn.addEventListener('click', rebuildIndex);
-    rebuildSmallBtn.addEventListener('click', rebuildIndex);
-    checkTextBtn.addEventListener('click', checkText);
-
-    // initial UI state
-    const initialLang = localStorage.getItem(UI_LANG_KEY) || 'en';
-    applyUiLanguage(initialLang);
-    loadHistory();
-    fetchCorpusCount();
-
-    window.__plag_ui = { renderResults, rebuildIndex };
-  </script>
-</body>
-</html>
 
 
 
