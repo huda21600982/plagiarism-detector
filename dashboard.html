@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI Plagiarism Detector — Dashboard</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -20,10 +22,21 @@
       }
     }
   </script>
+
+  <!-- THEME: apply before paint -->
+  <script>
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      if (!saved) localStorage.setItem('theme', 'light');
+    })();
+  </script>
+
   <style>
-    .heat-0 { background: linear-gradient(90deg,#ecfccb,#86efac); } /* green */
-    .heat-1 { background: linear-gradient(90deg,#fef9c3,#facc15); } /* yellow */
-    .heat-2 { background: linear-gradient(90deg,#fee2e2,#f43f5e); } /* red */
+    .heat-0 { background: linear-gradient(90deg,#ecfccb,#86efac); }
+    .heat-1 { background: linear-gradient(90deg,#fef9c3,#facc15); }
+    .heat-2 { background: linear-gradient(90deg,#fee2e2,#f43f5e); }
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
   </style>
@@ -48,22 +61,17 @@
 
         <span id="currentUserBadge" class="hidden sm:inline-block px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-200"></span>
 
-        <!-- UI language toggle (EN/AR) -->
-        <button id="uiLangToggle" class="px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-50 dark:hover:bg-gray-800">
-          AR
-        </button>
+        <button id="uiLangToggle" class="px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-50 dark:hover:bg-gray-800">AR</button>
 
-        <!-- Day/Night toggle -->
         <button id="themeToggle" class="p-2 rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm" title="Toggle theme">
-          <svg id="themeIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+          <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
           </svg>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Layout: Sidebar + Main -->
   <div class="min-h-screen flex">
 
     <!-- SIDEBAR -->
@@ -93,10 +101,8 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <div class="flex-1 p-6">
-
-      <!-- Header -->
       <header class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <h2 id="scanTitle" class="text-xl font-bold text-gray-900 dark:text-white">Scan · New</h2>
@@ -119,10 +125,8 @@
         </div>
       </header>
 
-      <!-- Body -->
       <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- Left column: input -->
         <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
           <div class="flex items-start justify-between">
             <h3 id="pasteTextLabel" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
@@ -136,7 +140,6 @@
           <div class="mt-4 flex items-center gap-3">
             <button id="checkTextBtn" class="px-5 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">Check Text</button>
 
-            <!-- Drag-drop zone / file input -->
             <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200">
               <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" />
               <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,10 +153,11 @@
             </div>
           </div>
 
-          <!-- Corpus Scraper -->
           <div class="mt-5 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
             <label id="scraperLabel" class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
-            <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm" placeholder="https://example.com/article"></textarea>
+            <textarea id="urlList" rows="2"
+              class="mt-2 w-full p-2 rounded border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm"
+              placeholder="https://example.com/article"></textarea>
             <div class="mt-3 flex gap-3">
               <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white">Add to Corpus</button>
               <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">Rebuild Index</button>
@@ -162,7 +166,6 @@
           </div>
         </section>
 
-        <!-- Right column: summary + history -->
         <aside class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow space-y-4">
           <div>
             <h4 id="scanSummaryLabel" class="text-sm font-semibold text-gray-800 dark:text-gray-100">Scan Summary</h4>
@@ -185,19 +188,15 @@
 
       </div>
 
-      <!-- RESULTS -->
       <section id="resultsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
         <div class="flex items-center justify-between">
           <h3 id="resultsHeader" class="text-lg font-semibold">Scan Results</h3>
           <div id="overallBadge" class="text-sm font-semibold px-3 py-1 rounded-lg">—</div>
         </div>
 
-        <!-- Summary Card -->
         <div id="resultsSummaryCard" class="mt-4 p-4 rounded-lg bg-panel dark:bg-gray-900/70 border border-purple-accent/10 text-sm hidden"></div>
-
         <div id="resultsContent" class="mt-4 grid grid-cols-1 gap-4"></div>
       </section>
-
     </div>
   </div>
 
@@ -206,7 +205,26 @@
     const SCORE_THRESHOLDS = { low: 30, med: 60 };
     const UI_LANG_KEY = "ui_lang";
 
-    /* ========= UI STRINGS ========= */
+    // THEME toggle (shared)
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(mode) {
+      if (mode === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', mode);
+    }
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(isDark ? 'light' : 'dark');
+    });
+
+    // User badge + per-user history
+    const currentUser = localStorage.getItem('current_user') || 'Guest';
+    const historyKey = `scan_history_${currentUser}`;
+    const currentUserBadge = document.getElementById('currentUserBadge');
+    currentUserBadge.textContent = (currentUser === 'Guest') ? 'Guest (not logged in)' : `Signed in as ${currentUser}`;
+    currentUserBadge.classList.remove('hidden');
+
+    // UI strings
     const uiStrings = {
       en: {
         appName: "PlagAware",
@@ -268,7 +286,6 @@
 
     function applyUiLanguage(lang) {
       const s = uiStrings[lang] || uiStrings.en;
-
       document.documentElement.lang = (lang === "ar") ? "ar" : "en";
       document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
 
@@ -305,19 +322,24 @@
       document.getElementById("corpusSizeLabel").textContent = s.corpusSizeLabel;
       document.getElementById("builtNote").textContent = s.builtNote;
 
-      if (summaryBox.textContent.trim() === uiStrings.en.noScanYet || summaryBox.textContent.trim() === uiStrings.ar.noScanYet) {
-        summaryBox.textContent = s.noScanYet;
-      }
-
       const toggleBtn = document.getElementById("uiLangToggle");
       toggleBtn.textContent = (lang === "ar") ? "EN" : "AR";
     }
 
-    /* ========= DOM refs ========= */
+    const uiLangToggle = document.getElementById('uiLangToggle');
+    uiLangToggle.addEventListener('click', () => {
+      const current = localStorage.getItem(UI_LANG_KEY) || 'en';
+      const next = current === 'en' ? 'ar' : 'en';
+      localStorage.setItem(UI_LANG_KEY, next);
+      applyUiLanguage(next);
+    });
+
+    // DOM
     const inputText = document.getElementById('inputText');
     const checkTextBtn = document.getElementById('checkTextBtn');
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
+    const dropLabel = document.getElementById('dropLabel');
     const uploadProgress = document.getElementById('uploadProgress');
     const uploadBar = document.getElementById('uploadBar');
     const resultsPanel = document.getElementById('resultsPanel');
@@ -331,40 +353,16 @@
     const scrapeBtn = document.getElementById('scrapeBtn');
     const rebuildBtn = document.getElementById('rebuildBtn');
     const rebuildSmallBtn = document.getElementById('rebuildSmallBtn');
-    const themeToggle = document.getElementById('themeToggle');
-    const uiLangToggle = document.getElementById('uiLangToggle');
 
-    /* ========= Theme sync ========= */
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
-    themeToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-
-    /* ========= Current user badge + per-user history ========= */
-    const currentUser = localStorage.getItem('current_user') || 'Guest';
-    const historyKey = `scan_history_${currentUser}`;
-    const currentUserBadge = document.getElementById('currentUserBadge');
-    if (currentUserBadge) {
-      currentUserBadge.textContent = (currentUser === 'Guest') ? 'Guest (not logged in)' : `Signed in as ${currentUser}`;
-      currentUserBadge.classList.remove('hidden');
+    function escapeHtml(s='') {
+      return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
     }
 
-    /* ========= UI language toggle ========= */
-    uiLangToggle.addEventListener('click', () => {
-      const current = localStorage.getItem(UI_LANG_KEY) || 'en';
-      const next = current === 'en' ? 'ar' : 'en';
-      localStorage.setItem(UI_LANG_KEY, next);
-      applyUiLanguage(next);
-    });
-
-    /* ========= History ========= */
+    // History
     function loadHistory() {
       const h = JSON.parse(localStorage.getItem(historyKey) || '[]');
       renderHistory(h);
     }
-
     function saveToHistory(item) {
       const h = JSON.parse(localStorage.getItem(historyKey) || '[]');
       h.unshift(item);
@@ -372,7 +370,6 @@
       localStorage.setItem(historyKey, JSON.stringify(h));
       renderHistory(h);
     }
-
     function renderHistory(h) {
       historyList.innerHTML = '';
       const lang = localStorage.getItem(UI_LANG_KEY) || 'en';
@@ -382,20 +379,18 @@
         historyList.innerHTML = `<li class="text-xs text-gray-400">${s.noScansHistory}</li>`;
         return;
       }
-      h.forEach((it, idx) => {
+      h.forEach((it) => {
         const li = document.createElement('li');
-        li.innerHTML = `<button data-idx="${idx}" class="w-full text-left text-sm px-2 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">${escapeHtml(it.label)} · <span class="text-xs text-gray-500">${escapeHtml(it.date)}</span></button>`;
-        li.querySelector('button').addEventListener('click', ()=> showResultFromHistory(it));
+        li.innerHTML = `<button class="w-full text-left text-sm px-2 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">${escapeHtml(it.label)} · <span class="text-xs text-gray-500">${escapeHtml(it.date)}</span></button>`;
+        li.querySelector('button').addEventListener('click', ()=> {
+          renderResults(it.data);
+          summaryBox.innerHTML = `<div class="text-sm font-medium">${escapeHtml(it.label)}</div><div class="text-xs text-gray-500">${escapeHtml(it.date)}</div>`;
+        });
         historyList.appendChild(li);
       });
     }
 
-    function showResultFromHistory(it) {
-      renderResults(it.data);
-      summaryBox.innerHTML = `<div class="text-sm font-medium">${escapeHtml(it.label)}</div><div class="text-xs text-gray-500">${escapeHtml(it.date)}</div>`;
-    }
-
-    /* ========= Corpus count loader ========= */
+    // Corpus count
     async function fetchCorpusCount() {
       try {
         const res = await fetch(`${backendUrl}/rebuild-index`, { method: 'POST' });
@@ -409,8 +404,7 @@
       }
     }
 
-    /* ========= Scanning functions ========= */
-    function setLoading(on, label = 'Scanning...') {
+    function setLoading(on, label='Scanning...') {
       if (on) {
         checkTextBtn.disabled = true;
         uploadProgress.classList.add('hidden');
@@ -427,7 +421,6 @@
       if (!text) return alert('Please paste some text to scan.');
 
       setLoading(true, 'Analyzing text…');
-
       try {
         const res = await fetch(`${backendUrl}/check-text`, {
           method: 'POST',
@@ -435,11 +428,7 @@
           body: JSON.stringify({ text, language })
         });
         const j = await res.json();
-        if (j.error) {
-          setLoading(false);
-          alert(j.error);
-          return;
-        }
+        if (j.error) { setLoading(false); alert(j.error); return; }
         setLoading(false);
         renderResults(j);
         saveToHistory({ label: 'Text scan', date: new Date().toLocaleString(), data: j });
@@ -456,7 +445,6 @@
         const fd = new FormData();
         fd.append('file', file);
         fd.append('language', language || 'auto');
-
         xhr.open('POST', `${backendUrl}/check-file`, true);
 
         xhr.upload.onprogress = function(e) {
@@ -471,25 +459,16 @@
           uploadProgress.classList.add('hidden');
           uploadBar.style.width = '0%';
           if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const json = JSON.parse(xhr.responseText);
-              resolve(json);
-            } catch(e) { reject(e); }
-          } else {
-            reject(new Error('Upload failed: ' + xhr.status));
-          }
+            try { resolve(JSON.parse(xhr.responseText)); }
+            catch(e) { reject(e); }
+          } else reject(new Error('Upload failed: ' + xhr.status));
         };
 
-        xhr.onerror = function() {
-          uploadProgress.classList.add('hidden');
-          reject(new Error('Network error'));
-        };
-
+        xhr.onerror = function() { uploadProgress.classList.add('hidden'); reject(new Error('Network error')); };
         xhr.send(fd);
       });
     }
 
-    // Dropzone handlers
     dropZone.addEventListener('click', ()=> fileInput.click());
     dropZone.addEventListener('dragover', (e)=> { e.preventDefault(); dropZone.classList.add('ring-2','ring-purple-accent/30'); });
     dropZone.addEventListener('dragleave', ()=> { dropZone.classList.remove('ring-2','ring-purple-accent/30'); });
@@ -498,13 +477,13 @@
       dropZone.classList.remove('ring-2','ring-purple-accent/30');
       const f = e.dataTransfer.files[0];
       if (!f) return;
-      document.getElementById('dropLabel').textContent = f.name;
+      dropLabel.textContent = f.name;
       await handleFileUpload(f);
     });
     fileInput.addEventListener('change', async ()=> {
       const f = fileInput.files[0];
       if (!f) return;
-      document.getElementById('dropLabel').textContent = f.name;
+      dropLabel.textContent = f.name;
       await handleFileUpload(f);
     });
 
@@ -513,11 +492,7 @@
       try {
         const language = document.getElementById('languageSelect').value;
         const result = await uploadFileWithProgress(file, language);
-        if (result.error) {
-          setLoading(false);
-          alert(result.error);
-          return;
-        }
+        if (result.error) { setLoading(false); alert(result.error); return; }
         setLoading(false);
         renderResults(result);
         saveToHistory({ label: `File: ${file.name}`, date: new Date().toLocaleString(), data: result });
@@ -528,7 +503,6 @@
       }
     }
 
-    /* ========= Render results ========= */
     function renderResults(data) {
       resultsPanel.classList.remove('hidden');
       resultsContent.innerHTML = '';
@@ -541,76 +515,46 @@
       overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
       overallBadge.textContent = `${score}% — ${data.message || ''}`;
 
-      // translation info
       const usedTranslation = !!data.used_translation;
       const requestedLang = data.requested_language || 'auto';
       const targetLang = data.target_language || 'en';
 
-      let translationNote = '';
-      if (usedTranslation) {
-        translationNote = `
-          <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
-            Text was translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> before analysis
-            (requested: <code>${escapeHtml(requestedLang)}</code>).
-          </div>
-        `;
-      }
-
       summaryBox.innerHTML = `
         <div class="text-sm font-medium">Last scan: ${new Date().toLocaleString()}</div>
         <div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(data.message || '')}</div>
-        ${translationNote}
+        ${usedTranslation ? `<div class="mt-1 text-xs text-purple-700 dark:text-purple-300">Translated to <strong>${escapeHtml(targetLang.toUpperCase())}</strong> (requested: <code>${escapeHtml(requestedLang)}</code>).</div>` : ''}
       `;
 
       const details = data.details || [];
+      let maxSim = 0, maxChunk = -1, highCount = 0;
 
-      // Summary card metrics
-      let maxSim = 0;
-      let maxChunkIndex = -1;
-      let highCount = 0;
-
-      details.forEach((d, idx) => {
-        const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity * 100) : (d.best_similarity || 0);
-        if (sim > maxSim) { maxSim = sim; maxChunkIndex = idx; }
+      details.forEach((d, i) => {
+        const sim = (d.best_similarity ?? 0) * 100;
+        if (sim > maxSim) { maxSim = sim; maxChunk = i; }
         if (sim > SCORE_THRESHOLDS.med) highCount++;
       });
 
-      let riskLabel = 'Low risk';
-      let riskColor = 'text-green-600';
-      if (score > SCORE_THRESHOLDS.med) { riskLabel = 'High risk'; riskColor = 'text-red-600'; }
-      else if (score > SCORE_THRESHOLDS.low) { riskLabel = 'Medium risk'; riskColor = 'text-yellow-600'; }
-
       const summaryCard = document.getElementById('resultsSummaryCard');
-      if (summaryCard) {
-        summaryCard.classList.remove('hidden');
-        summaryCard.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Overall status</div>
-              <div class="text-sm font-semibold ${riskColor}">${riskLabel}</div>
-            </div>
-            <div class="flex flex-wrap gap-6 text-xs">
-              <div>
-                <div class="text-gray-500 dark:text-gray-400">Overall similarity</div>
-                <div class="font-semibold">${Number(score).toFixed(2)}%</div>
-              </div>
-              <div>
-                <div class="text-gray-500 dark:text-gray-400">Most suspicious chunk</div>
-                <div class="font-semibold">${maxChunkIndex >= 0 ? `Chunk ${maxChunkIndex + 1} (${maxSim.toFixed(2)}%)` : '—'}</div>
-              </div>
-              <div>
-                <div class="text-gray-500 dark:text-gray-400">High-risk chunks (&gt; ${SCORE_THRESHOLDS.med}%)</div>
-                <div class="font-semibold">${highCount}</div>
-              </div>
-            </div>
+      summaryCard.classList.remove('hidden');
+      summaryCard.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            Overall similarity:
+            <span class="font-semibold text-gray-900 dark:text-gray-100">${Number(score).toFixed(2)}%</span>
           </div>
-        `;
-      }
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            Most suspicious:
+            <span class="font-semibold text-gray-900 dark:text-gray-100">${maxChunk >= 0 ? `Chunk ${maxChunk+1} (${maxSim.toFixed(2)}%)` : '—'}</span>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            High-risk chunks (&gt; ${SCORE_THRESHOLDS.med}%):
+            <span class="font-semibold text-gray-900 dark:text-gray-100">${highCount}</span>
+          </div>
+        </div>
+      `;
 
-      // Render chunks
       details.forEach((d, idx) => {
-        const sim = (d.best_similarity ?? d.best_similarity === 0) ? (d.best_similarity * 100) : (d.best_similarity || 0);
-
+        const sim = (d.best_similarity ?? 0) * 100;
         let heatClass = 'heat-0';
         if (sim > 60) heatClass = 'heat-2';
         else if (sim > 30) heatClass = 'heat-1';
@@ -620,29 +564,28 @@
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <div class="text-sm font-medium">Chunk ${idx + 1}</div>
+            <div class="text-sm font-medium">Chunk ${idx+1}</div>
             <div class="text-sm font-semibold">${sim.toFixed(2)}%</div>
           </div>
-          <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || d.sentence || '')}</div>
+          <div class="mt-2 text-sm whitespace-pre-wrap">${escapeHtml(d.chunk_text || '')}</div>
         `;
 
         if (d.matches && d.matches.length) {
           const ul = document.createElement('ul');
           ul.className = 'mt-3 text-xs list-disc ml-5';
 
-          d.matches.slice(0, 3).forEach(m => {
+          d.matches.slice(0,3).forEach(m => {
             const li = document.createElement('li');
-
             const label = m.title || m.url || m.source || 'source';
             const safeLabel = escapeHtml(label);
             const safeUrl = m.url ? escapeHtml(m.url) : null;
-            const snippet = escapeHtml((m.matched_text || '').slice(0, 140)) + '...';
+            const snippet = escapeHtml((m.matched_text || '').slice(0,140)) + '...';
             const simPct = ((m.similarity || 0) * 100).toFixed(2);
 
             li.innerHTML = safeUrl
-              ? `<strong><a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="text-purple-accent hover:underline">${safeLabel}</a></strong>
-                 — ${simPct}%<br><em class="text-xs text-gray-500 dark:text-gray-400">${snippet}</em>`
-              : `<strong>${safeLabel}</strong> — ${simPct}%<br><em class="text-xs text-gray-500 dark:text-gray-400">${snippet}</em>`;
+              ? `<strong><a class="text-purple-accent hover:underline" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeLabel}</a></strong>
+                 — ${simPct}%<br><em class="text-gray-500 dark:text-gray-400">${snippet}</em>`
+              : `<strong>${safeLabel}</strong> — ${simPct}%<br><em class="text-gray-500 dark:text-gray-400">${snippet}</em>`;
 
             ul.appendChild(li);
           });
@@ -666,15 +609,11 @@
       resultsPanel.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function escapeHtml(s='') {
-      return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
-    }
-
-    /* ========= Scrape + rebuild ========= */
+    // scrape + rebuild
     scrapeBtn.addEventListener('click', async () => {
       const raw = urlList.value.trim();
       if (!raw) return alert('Enter at least one URL (newline separated).');
-      const urls = raw.split(/\n+/).map(u => u.trim()).filter(Boolean);
+      const urls = raw.split(/\n+/).map(u=>u.trim()).filter(Boolean);
 
       setLoading(true, 'Scraping sources...');
       try {
@@ -684,15 +623,11 @@
           body: JSON.stringify({ urls })
         });
         const j = await res.json();
-        if (j.error) {
-          setLoading(false);
-          alert(j.error);
-          return;
-        }
+        if (j.error) { setLoading(false); alert(j.error); return; }
         setLoading(false);
         alert(`Saved ${j.saved_count || 0} documents to corpus.`);
         await rebuildIndex();
-      } catch (e) {
+      } catch(e) {
         setLoading(false);
         alert('Scrape failed. See console.');
         console.error(e);
@@ -708,7 +643,7 @@
         corpusCount.textContent = `${j.corpus_count ?? 0} chunks`;
         sidebarCorpusCount.textContent = `${j.corpus_count ?? 0}`;
         alert('Index rebuilt. Corpus size: ' + (j.corpus_count || 0));
-      } catch (e) {
+      } catch(e) {
         setLoading(false);
         alert('Rebuild failed.');
         console.error(e);
@@ -717,20 +652,17 @@
 
     rebuildBtn.addEventListener('click', rebuildIndex);
     rebuildSmallBtn.addEventListener('click', rebuildIndex);
-
-    /* ========= Init ========= */
     checkTextBtn.addEventListener('click', checkText);
 
+    // init
     loadHistory();
     fetchCorpusCount();
-
-    const initialUiLang = localStorage.getItem(UI_LANG_KEY) || 'en';
-    applyUiLanguage(initialUiLang);
-
-    window.__plag_ui = { renderResults, rebuildIndex };
+    applyUiLanguage(localStorage.getItem(UI_LANG_KEY) || 'en');
   </script>
 </body>
 </html>
+
+
 
 
 
