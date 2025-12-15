@@ -20,9 +20,9 @@
     }
   </script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-50 font-sans">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
 
-  <nav class="border-b border-white/5 bg-black/20 backdrop-blur">
+  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">
@@ -30,15 +30,25 @@
         </div>
         <div>
           <div class="font-extrabold text-lg">PlagAware</div>
-          <div class="text-xs text-gray-400">AI-powered plagiarism detection</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">AI-powered plagiarism detection</div>
         </div>
       </div>
-      <a href="dashboard.html" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-accent text-sm font-semibold">
-        Open Dashboard
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
+
+      <div class="flex items-center gap-2">
+        <!-- Theme toggle -->
+        <button id="themeToggle" class="p-2 rounded-md bg-gray-100 dark:bg-gray-800" title="Toggle light/dark">
+          <svg id="themeIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+          </svg>
+        </button>
+
+        <a href="dashboard.html" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-accent text-sm font-semibold text-white">
+          Open Dashboard
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </nav>
 
@@ -49,43 +59,43 @@
         AI-based <span class="text-purple-accent">Plagiarism Detection</span>
         for student work
       </h1>
-      <p class="mt-4 text-sm sm:text-base text-gray-300 max-w-xl">
+      <p class="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-xl">
         PlagAware uses multilingual sentence embeddings, semantic similarity search and intelligent translation
         to detect copied, paraphrased, and AI-generated text — even across different languages.
       </p>
 
-      <ul class="mt-6 space-y-2 text-sm text-gray-300">
+      <ul class="mt-6 space-y-2 text-sm text-gray-600 dark:text-gray-300">
         <li class="flex items-start gap-2">
-          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
           <span>Upload <strong>PDF/DOCX/TXT</strong> or paste text directly.</span>
         </li>
         <li class="flex items-start gap-2">
-          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
           <span>Multilingual support with automatic translation to English.</span>
         </li>
         <li class="flex items-start gap-2">
-          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
           <span>Semantic matching against a custom web corpus and local files.</span>
         </li>
       </ul>
 
       <div class="mt-8 flex flex-wrap gap-3">
-        <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-accent text-sm font-semibold">
+        <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-accent text-sm font-semibold text-white">
           Go to Checker
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
-        <span class="text-xs text-gray-400 self-center">Login below to personalise your scans.</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400 self-center">Login below to personalise your scans.</span>
       </div>
     </section>
 
     <!-- Right: login/register card -->
-    <section class="bg-black/40 border border-white/10 rounded-2xl p-6 shadow-xl shadow-black/40">
+    <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow">
       <h2 class="text-lg font-semibold">Sign in</h2>
-      <p class="mt-1 text-xs text-gray-400">Accounts are stored locally on the server for demo purposes.</p>
+      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Accounts are stored locally on the server for demo purposes.</p>
 
-      <div class="mt-4 flex text-xs border-b border-white/10">
+      <div class="mt-4 flex text-xs border-b border-gray-200 dark:border-gray-800">
         <button id="tabLogin" class="flex-1 py-2 text-center font-semibold border-b-2 border-purple-accent text-purple-accent">
           Login
         </button>
@@ -97,14 +107,14 @@
       <!-- Login form -->
       <form id="loginForm" class="mt-4 space-y-3">
         <div>
-          <label class="text-xs text-gray-300">Username</label>
-          <input id="loginUsername" type="text" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+          <label class="text-xs text-gray-600 dark:text-gray-300">Username</label>
+          <input id="loginUsername" type="text" class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none" required>
         </div>
         <div>
-          <label class="text-xs text-gray-300">Password</label>
-          <input id="loginPassword" type="password" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+          <label class="text-xs text-gray-600 dark:text-gray-300">Password</label>
+          <input id="loginPassword" type="password" class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none" required>
         </div>
-        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold">
+        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold text-white">
           Login
         </button>
       </form>
@@ -112,28 +122,42 @@
       <!-- Register form -->
       <form id="registerForm" class="mt-4 space-y-3 hidden">
         <div>
-          <label class="text-xs text-gray-300">Choose a username</label>
-          <input id="regUsername" type="text" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+          <label class="text-xs text-gray-600 dark:text-gray-300">Choose a username</label>
+          <input id="regUsername" type="text" class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none" required>
         </div>
         <div>
-          <label class="text-xs text-gray-300">Choose a password</label>
-          <input id="regPassword" type="password" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+          <label class="text-xs text-gray-600 dark:text-gray-300">Choose a password</label>
+          <input id="regPassword" type="password" class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none" required>
         </div>
-        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold">
+        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold text-white">
           Create Account
         </button>
       </form>
 
-      <p id="authMessage" class="mt-3 text-xs text-gray-300"></p>
+      <p id="authMessage" class="mt-3 text-xs text-gray-600 dark:text-gray-300"></p>
     </section>
   </main>
 
-  <footer class="mt-8 pb-6 text-center text-[11px] text-gray-500">
+  <footer class="mt-8 pb-6 text-center text-[11px] text-gray-500 dark:text-gray-400">
     Runs locally with Flask &amp; FAISS • Designed for a final year university project
   </footer>
 
   <script>
     const backendUrl = "http://127.0.0.1:5000";
+
+    // Apply saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
 
     const tabLogin = document.getElementById('tabLogin');
     const tabRegister = document.getElementById('tabRegister');
@@ -226,5 +250,6 @@
   </script>
 </body>
 </html>
+
 
 
