@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlagAware — AI Plagiarism Detector</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PlagAware — AI Plagiarism Checker</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -13,7 +13,6 @@
           colors: {
             'purple-accent': '#7C3AED',
             'purple-accent-2': '#C084FC',
-            'panel': '#F8FAFF',
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
@@ -21,158 +20,211 @@
     }
   </script>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-50 font-sans">
 
-  <!-- NAVBAR -->
-  <nav class="bg-white shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
+  <nav class="border-b border-white/5 bg-black/20 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">
           AI
         </div>
         <div>
           <div class="font-extrabold text-lg">PlagAware</div>
-          <div class="text-xs text-gray-500">AI Plagiarism Detection</div>
+          <div class="text-xs text-gray-400">AI-powered plagiarism detection</div>
         </div>
       </div>
-      <div class="hidden md:flex items-center gap-4 text-sm">
-        <a href="#features" class="hover:text-purple-accent">Features</a>
-        <a href="#how" class="hover:text-purple-accent">How it works</a>
-        <!-- replace this with your real GitHub repo link -->
-        <a href="https://github.com/your-username/your-repo" class="hover:text-purple-accent">GitHub</a>
-        <a href="dashboard.html" class="px-4 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">
-          Open Checker
-        </a>
-      </div>
+      <a href="dashboard.html" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-accent text-sm font-semibold">
+        Open Dashboard
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="max-w-6xl mx-auto px-4 pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center">
-    <div>
-      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
-        AI-powered plagiarism detection<br/>
-        for your projects and reports.
+  <main class="max-w-5xl mx-auto px-4 py-10 grid gap-10 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)] items-center">
+    <!-- Left: hero -->
+    <section>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+        AI-based <span class="text-purple-accent">Plagiarism Detection</span>
+        for student work
       </h1>
-      <p class="mt-4 text-gray-600 text-sm md:text-base">
-        Paste text in any language, upload documents, or add online sources. PlagAware translates
-        and analyzes your content against a local corpus using semantic embeddings and FAISS.
+      <p class="mt-4 text-sm sm:text-base text-gray-300 max-w-xl">
+        PlagAware uses multilingual sentence embeddings, semantic similarity search and intelligent translation
+        to detect copied, paraphrased, and AI-generated text — even across different languages.
       </p>
-      <div class="mt-6 flex flex-wrap gap-3">
-        <a href="dashboard.html" class="px-5 py-2.5 rounded-lg bg-purple-accent text-white text-sm font-semibold hover:opacity-95">
-          Open Plagiarism Checker
+
+      <ul class="mt-6 space-y-2 text-sm text-gray-300">
+        <li class="flex items-start gap-2">
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span>Upload <strong>PDF/DOCX/TXT</strong> or paste text directly.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span>Multilingual support with automatic translation to English.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+          <span>Semantic matching against a custom web corpus and local files.</span>
+        </li>
+      </ul>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-accent text-sm font-semibold">
+          Go to Checker
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </a>
-        <a href="#features" class="px-5 py-2.5 rounded-lg border text-sm font-semibold hover:border-purple-accent hover:text-purple-accent">
-          See Features
-        </a>
+        <span class="text-xs text-gray-400 self-center">Login below to personalise your scans.</span>
       </div>
-      <p class="mt-3 text-xs text-gray-500">
-        Multilingual input · Translation to English before analysis · Built for your university project.
-      </p>
-    </div>
+    </section>
 
-    <!-- Simple preview card -->
-    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-4 md:p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div class="text-sm font-semibold text-gray-700">Scan Preview</div>
-        <span class="text-xs px-2 py-1 rounded-full bg-purple-accent-2/20 text-purple-accent">
-          Demo
-        </span>
+    <!-- Right: login/register card -->
+    <section class="bg-black/40 border border-white/10 rounded-2xl p-6 shadow-xl shadow-black/40">
+      <h2 class="text-lg font-semibold">Sign in</h2>
+      <p class="mt-1 text-xs text-gray-400">Accounts are stored locally on the server for demo purposes.</p>
+
+      <div class="mt-4 flex text-xs border-b border-white/10">
+        <button id="tabLogin" class="flex-1 py-2 text-center font-semibold border-b-2 border-purple-accent text-purple-accent">
+          Login
+        </button>
+        <button id="tabRegister" class="flex-1 py-2 text-center text-gray-400 border-b-2 border-transparent">
+          Register
+        </button>
       </div>
-      <div class="space-y-3 text-xs">
-        <div class="flex items-center justify-between">
-          <span class="font-medium text-gray-700">Overall Score</span>
-          <span class="px-2 py-1 rounded-full bg-green-50 text-green-600 text-xs">
-            12% · Mostly original
-          </span>
+
+      <!-- Login form -->
+      <form id="loginForm" class="mt-4 space-y-3">
+        <div>
+          <label class="text-xs text-gray-300">Username</label>
+          <input id="loginUsername" type="text" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
         </div>
-        <div class="space-y-2">
-          <div class="p-2 rounded-lg bg-gray-50 border text-[11px]">
-            <div class="flex justify-between mb-1">
-              <span class="font-semibold">Chunk 1</span>
-              <span>15.23%</span>
-            </div>
-            <div class="line-clamp-2 text-gray-600">
-              This is an example of a mostly original paragraph with minor overlap…
-            </div>
-            <div class="mt-2 h-1.5 rounded-full bg-green-200"></div>
-          </div>
-          <div class="p-2 rounded-lg bg-gray-50 border text-[11px]">
-            <div class="flex justify-between mb-1">
-              <span class="font-semibold">Chunk 2</span>
-              <span>68.10%</span>
-            </div>
-            <div class="line-clamp-2 text-gray-600">
-              This section appears highly similar to an article in the corpus database…
-            </div>
-            <div class="mt-2 h-1.5 rounded-full bg-red-200"></div>
-          </div>
+        <div>
+          <label class="text-xs text-gray-300">Password</label>
+          <input id="loginPassword" type="password" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
         </div>
-      </div>
-    </div>
-  </section>
+        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold">
+          Login
+        </button>
+      </form>
 
-  <!-- FEATURES -->
-  <section id="features" class="max-w-6xl mx-auto px-4 py-10">
-    <h2 class="text-xl font-bold mb-4">What you can do with PlagAware</h2>
-    <div class="grid md:grid-cols-3 gap-6 text-sm">
-      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
-        <div class="text-2xl mb-2">📝</div>
-        <div class="font-semibold mb-1">Paste or upload</div>
-        <p class="text-gray-600">
-          Paste up to 10,000 characters or upload PDF, DOCX, or TXT files for analysis in any language.
-        </p>
-      </div>
-      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
-        <div class="text-2xl mb-2">🌐</div>
-        <div class="font-semibold mb-1">Build your corpus</div>
-        <p class="text-gray-600">
-          Add URLs to scrape articles into a local corpus directory powering the similarity search.
-        </p>
-      </div>
-      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
-        <div class="text-2xl mb-2">📊</div>
-        <div class="font-semibold mb-1">Chunk-level results</div>
-        <p class="text-gray-600">
-          View chunk-by-chunk matches, similarity percentages, and highlight high-risk sections.
-        </p>
-      </div>
-    </div>
-  </section>
+      <!-- Register form -->
+      <form id="registerForm" class="mt-4 space-y-3 hidden">
+        <div>
+          <label class="text-xs text-gray-300">Choose a username</label>
+          <input id="regUsername" type="text" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+        </div>
+        <div>
+          <label class="text-xs text-gray-300">Choose a password</label>
+          <input id="regPassword" type="password" class="mt-1 w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-sm outline-none" required>
+        </div>
+        <button type="submit" class="w-full mt-2 bg-purple-accent rounded-lg py-2 text-sm font-semibold">
+          Create Account
+        </button>
+      </form>
 
-  <!-- HOW IT WORKS -->
-  <section id="how" class="max-w-6xl mx-auto px-4 py-10">
-    <h2 class="text-xl font-bold mb-4">How it works under the hood</h2>
-    <div class="grid md:grid-cols-2 gap-6 text-sm">
-      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
-        <h3 class="font-semibold mb-1">Embeddings, FAISS & translation</h3>
-        <p class="text-gray-600">
-          Your text is translated to English (if needed), split into chunks, converted into multilingual
-          sentence embeddings, and compared against your corpus using a FAISS index with cosine similarity.
-        </p>
-      </div>
-      <div class="p-4 bg-white rounded-xl shadow border border-gray-100">
-        <h3 class="font-semibold mb-1">Local-first design</h3>
-        <p class="text-gray-600">
-          Corpus files and indexes live on your machine or server. Ideal for university projects,
-          offline demos, or privacy-focused setups.
-        </p>
-      </div>
-    </div>
-  </section>
+      <p id="authMessage" class="mt-3 text-xs text-gray-300"></p>
+    </section>
+  </main>
 
-  <!-- FOOTER -->
-  <footer class="mt-10 border-t bg-white">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 gap-2">
-      <span>© 2025 PlagAware · Built for your AI plagiarism detection project</span>
-      <div class="flex gap-4">
-        <a href="dashboard.html" class="hover:text-purple-accent">Open Checker</a>
-        <!-- replace this with your real GitHub repo link -->
-        <a href="https://github.com/your-username/your-repo" class="hover:text-purple-accent">GitHub</a>
-      </div>
-    </div>
+  <footer class="mt-8 pb-6 text-center text-[11px] text-gray-500">
+    Runs locally with Flask &amp; FAISS • Designed for a final year university project
   </footer>
 
+  <script>
+    const backendUrl = "http://127.0.0.1:5000";
+
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authMessage = document.getElementById('authMessage');
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.classList.add('border-purple-accent','text-purple-accent');
+      tabLogin.classList.remove('text-gray-400');
+      tabRegister.classList.remove('border-purple-accent','text-purple-accent');
+      tabRegister.classList.add('text-gray-400');
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+      authMessage.textContent = '';
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.classList.add('border-purple-accent','text-purple-accent');
+      tabRegister.classList.remove('text-gray-400');
+      tabLogin.classList.remove('border-purple-accent','text-purple-accent');
+      tabLogin.classList.add('text-gray-400');
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      authMessage.textContent = '';
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authMessage.textContent = 'Logging in...';
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(`${backendUrl}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const j = await res.json();
+        if (!res.ok || j.error) {
+          authMessage.textContent = j.error || 'Login failed.';
+          authMessage.classList.remove('text-green-400');
+          authMessage.classList.add('text-red-400');
+          return;
+        }
+        localStorage.setItem('current_user', j.username);
+        authMessage.textContent = 'Login successful. Redirecting to dashboard...';
+        authMessage.classList.remove('text-red-400');
+        authMessage.classList.add('text-green-400');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 600);
+      } catch (err) {
+        console.error(err);
+        authMessage.textContent = 'Could not reach backend.';
+        authMessage.classList.add('text-red-400');
+      }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authMessage.textContent = 'Creating account...';
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        const res = await fetch(`${backendUrl}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const j = await res.json();
+        if (!res.ok || j.error) {
+          authMessage.textContent = j.error || 'Registration failed.';
+          authMessage.classList.remove('text-green-400');
+          authMessage.classList.add('text-red-400');
+          return;
+        }
+        authMessage.textContent = 'Account created. You can now log in.';
+        authMessage.classList.remove('text-red-400');
+        authMessage.classList.add('text-green-400');
+        tabLogin.click();
+      } catch (err) {
+        console.error(err);
+        authMessage.textContent = 'Could not reach backend.';
+        authMessage.classList.add('text-red-400');
+      }
+    });
+  </script>
 </body>
 </html>
+
 
