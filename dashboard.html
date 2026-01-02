@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Plagiarism Detector — Dashboard</title>
+  <title>PlagAware — AI Plagiarism Checker</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -29,12 +30,17 @@
 
     /* highlight */
     mark.plag-mark { background: #fde68a; padding: 0 2px; border-radius: 4px; }
+    .ai-warning { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
   </style>
 </head>
 
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
 
-  <!-- TOP NAVBAR (yours, with small AR button added) -->
+  <!-- TOP NAVBAR -->
   <nav class="bg-white/90 dark:bg-gray-900/90 border-b dark:border-gray-800 backdrop-blur sticky top-0 z-20">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -59,6 +65,11 @@
         <button id="uiLangToggle" class="px-3 py-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
           AR
         </button>
+        
+        <!-- Stats Badge -->
+        <div id="statsBadge" class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs">
+          <span id="totalScans">0</span> scans
+        </div>
       </div>
     </div>
   </nav>
@@ -81,15 +92,31 @@
           <button id="nav_scan" class="w-full text-left px-3 py-2 rounded-lg bg-purple-accent-2/10 text-sm font-medium text-purple-accent hover:bg-purple-accent-2/20">Scan</button>
           <button id="nav_corpus" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">Corpus</button>
           <button id="nav_history" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">History</button>
+          <button id="nav_stats" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">Statistics</button>
         </nav>
 
         <div class="mt-8">
           <p id="corpusSizeLabel" class="text-xs text-gray-500 dark:text-gray-400">Corpus size:</p>
           <div id="corpusCount" class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-200">—</div>
-          <button id="rebuildBtn" class="mt-3 w-full px-3 py-2 bg-purple-accent text-white rounded-lg text-sm">Rebuild Index</button>
+          <button id="rebuildBtn" class="mt-3 w-full px-3 py-2 bg-purple-accent text-white rounded-lg text-sm hover:opacity-95">Rebuild Index</button>
         </div>
 
-        <div class="mt-8 text-xs text-gray-400">Built for your university project • Local only</div>
+        <!-- Batch Upload Section -->
+        <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Batch Upload</p>
+          <input type="file" id="batchFileInput" multiple class="hidden" accept=".pdf,.docx,.txt">
+          <label for="batchFileInput" class="block w-full text-center px-3 py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
+            📁 Upload Multiple Files
+          </label>
+          <div id="batchProgress" class="mt-2 hidden">
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div id="batchProgressBar" class="bg-purple-accent h-2 rounded-full" style="width: 0%"></div>
+            </div>
+            <div id="batchStatus" class="text-xs text-gray-500 mt-1"></div>
+          </div>
+        </div>
+
+        <div class="mt-8 text-xs text-gray-400">AI Detection • Citation Generation • Multi-Language</div>
       </div>
     </aside>
 
@@ -104,7 +131,7 @@
 
         <div class="flex items-center space-x-4">
           <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-            <label id="langLabel" class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we’ll translate)</label>
+            <label id="langLabel" class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we'll translate)</label>
             <select id="languageSelect" class="text-sm bg-transparent outline-none">
               <option value="auto">Detect</option>
               <option value="en">English</option>
@@ -143,7 +170,7 @@
           <div class="mt-4 flex items-center gap-3">
             <button id="checkTextBtn" class="px-5 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">Check Text</button>
 
-            <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200">
+            <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200 hover:bg-purple-accent-2/20">
               <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" />
               <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 018 0v8"/>
@@ -160,8 +187,8 @@
             <label id="scrapeLabel" class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
             <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border dark:bg-gray-900 text-sm" placeholder="https://example.com/article"></textarea>
             <div class="mt-3 flex gap-3">
-              <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white">Add to Corpus</button>
-              <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border">Rebuild Index</button>
+              <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white hover:opacity-95">Add to Corpus</button>
+              <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800">Rebuild Index</button>
             </div>
             <p id="scrapeHint" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
               Adding URLs will attempt to scrape and save articles to the corpus directory on the server.
@@ -191,6 +218,38 @@
         </aside>
       </div>
 
+      <!-- AI Detection Panel -->
+      <section id="aiDetectionPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">🤖 AI-Generated Text Analysis</h3>
+          <div id="aiBadge" class="text-sm font-semibold px-3 py-1 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">—</div>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
+            <div class="text-xs text-gray-500 dark:text-gray-400">AI Probability</div>
+            <div id="aiProbability" class="text-2xl font-bold mt-1">--%</div>
+          </div>
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
+            <div class="text-xs text-gray-500 dark:text-gray-400">Confidence</div>
+            <div id="aiConfidence" class="text-2xl font-bold mt-1">--</div>
+          </div>
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
+            <div class="text-xs text-gray-500 dark:text-gray-400">Status</div>
+            <div id="aiStatus" class="text-lg font-semibold mt-1">Analyzing...</div>
+          </div>
+        </div>
+        <div id="aiWarning" class="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hidden ai-warning">
+          <div class="flex items-center gap-2 text-red-700 dark:text-red-300">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <span class="font-medium">Warning:</span>
+            <span id="aiWarningText">This text may be AI-generated</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Panel -->
       <section id="resultsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
         <div class="flex items-center justify-between">
           <h3 id="resultsTitle" class="text-lg font-semibold">Scan Results</h3>
@@ -198,6 +257,48 @@
         </div>
 
         <div id="resultsContent" class="mt-4 grid grid-cols-1 gap-4"></div>
+      </section>
+
+      <!-- Citations Panel -->
+      <section id="citationsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold">📚 Citations</h3>
+          <div class="flex gap-2">
+            <button id="apaBtn" class="px-3 py-1 rounded-lg bg-purple-accent text-white text-sm hover:opacity-95">APA</button>
+            <button id="mlaBtn" class="px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600">MLA</button>
+            <button id="copyCitationsBtn" class="px-3 py-1 rounded-lg bg-green-600 text-white text-sm hover:opacity-95">
+              Copy All
+            </button>
+          </div>
+        </div>
+        <div id="citationsList" class="space-y-3 max-h-96 overflow-y-auto p-2">
+          <!-- Citations will be inserted here -->
+        </div>
+      </section>
+
+      <!-- Statistics Panel -->
+      <section id="statsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+        <h3 class="text-lg font-semibold mb-4">📊 Statistics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+            <div class="text-xs text-gray-500 dark:text-gray-400">Total Scans</div>
+            <div id="statsTotalScans" class="text-2xl font-bold mt-1">0</div>
+          </div>
+          <div class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+            <div class="text-xs text-gray-500 dark:text-gray-400">Average Score</div>
+            <div id="statsAvgScore" class="text-2xl font-bold mt-1">0%</div>
+          </div>
+          <div class="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+            <div class="text-xs text-gray-500 dark:text-gray-400">Today's Scans</div>
+            <div id="statsTodayScans" class="text-2xl font-bold mt-1">0</div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h4 class="text-sm font-semibold mb-2">Recent Activity</h4>
+          <div id="recentActivity" class="space-y-2 max-h-48 overflow-y-auto">
+            <!-- Activity items will be inserted here -->
+          </div>
+        </div>
       </section>
 
     </div>
@@ -209,6 +310,7 @@
     const SCORE_THRESHOLDS = { low:30, med:60 };
     const UI_LANG_KEY = "ui_lang";
     window.__lastResult = null;
+    let currentUser = localStorage.getItem('current_user') || 'anonymous';
 
     /* ====== i18n strings (English/Arabic) ====== */
     const STR = {
@@ -218,7 +320,7 @@
         subtitle: "AI Plagiarism Dashboard",
         pageTitle: "Scan · New",
         pageHint: "Paste text or upload a document to detect plagiarism",
-        langLabel: "Language (we’ll translate)",
+        langLabel: "Language (we'll translate)",
         pasteTitle: "Paste text",
         limit: "Up to 10,000 chars",
         check: "Check Text",
@@ -240,7 +342,10 @@
         analyzing: "Analyzing text…",
         uploading: "Uploading file & scanning...",
         scraping: "Scraping sources...",
-        rebuilding: "Rebuilding index..."
+        rebuilding: "Rebuilding index...",
+        aiWarning: "This text shows signs of AI generation",
+        batchUpload: "Upload Multiple Files",
+        generatingCitations: "Generating citations..."
       },
       ar: {
         home: "الصفحة الرئيسية",
@@ -270,7 +375,10 @@
         analyzing: "جارٍ تحليل النص…",
         uploading: "جارٍ رفع الملف وفحصه...",
         scraping: "جارٍ استخراج المصادر...",
-        rebuilding: "جارٍ إعادة بناء الفهرس..."
+        rebuilding: "جارٍ إعادة بناء الفهرس...",
+        aiWarning: "يبدو أن هذا النص تم إنشاؤه بواسطة الذكاء الاصطناعي",
+        batchUpload: "رفع ملفات متعددة",
+        generatingCitations: "جارٍ إنشاء المراجع..."
       }
     };
 
@@ -316,9 +424,6 @@
       const toggle = document.getElementById("uiLangToggle");
       toggle.textContent = (lang === "ar") ? "EN" : "AR";
 
-      // re-render last result to translate result-box labels too
-      if (window.__lastResult) renderResults(window.__lastResult);
-      // if no scan yet, keep localized
       if (!window.__lastResult) summaryBox.textContent = s.noScan;
     }
 
@@ -342,8 +447,30 @@
     const rebuildBtn = document.getElementById('rebuildBtn');
     const rebuildSmallBtn = document.getElementById('rebuildSmallBtn');
     const themeToggle = document.getElementById('themeToggle');
+    const batchFileInput = document.getElementById('batchFileInput');
+    const batchProgress = document.getElementById('batchProgress');
+    const batchProgressBar = document.getElementById('batchProgressBar');
+    const batchStatus = document.getElementById('batchStatus');
+    const aiDetectionPanel = document.getElementById('aiDetectionPanel');
+    const aiProbability = document.getElementById('aiProbability');
+    const aiConfidence = document.getElementById('aiConfidence');
+    const aiStatus = document.getElementById('aiStatus');
+    const aiWarning = document.getElementById('aiWarning');
+    const aiWarningText = document.getElementById('aiWarningText');
+    const aiBadge = document.getElementById('aiBadge');
+    const citationsPanel = document.getElementById('citationsPanel');
+    const citationsList = document.getElementById('citationsList');
+    const apaBtn = document.getElementById('apaBtn');
+    const mlaBtn = document.getElementById('mlaBtn');
+    const copyCitationsBtn = document.getElementById('copyCitationsBtn');
+    const statsPanel = document.getElementById('statsPanel');
+    const statsTotalScans = document.getElementById('statsTotalScans');
+    const statsAvgScore = document.getElementById('statsAvgScore');
+    const statsTodayScans = document.getElementById('statsTodayScans');
+    const recentActivity = document.getElementById('recentActivity');
+    const totalScansBadge = document.getElementById('totalScans');
 
-    /* ====== Theme toggle (your original) ====== */
+    /* ====== Theme toggle ====== */
     if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
     themeToggle.addEventListener('click', ()=>{
       document.documentElement.classList.toggle('dark');
@@ -358,7 +485,36 @@
       applyLangUI();
     });
 
-    /* ====== history ====== */
+    /* ====== Navigation ====== */
+    document.getElementById('nav_scan').addEventListener('click', () => {
+      showPanel('scan');
+    });
+    document.getElementById('nav_history').addEventListener('click', async () => {
+      await showPanel('history');
+      loadHistoryFromServer();
+    });
+    document.getElementById('nav_stats').addEventListener('click', async () => {
+      await showPanel('stats');
+      loadStats();
+    });
+
+    function showPanel(panelName) {
+      // Hide all panels
+      document.querySelectorAll('section[id$="Panel"]').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      
+      // Show selected panel
+      if (panelName === 'scan') {
+        // Show main content (already visible)
+      } else if (panelName === 'history') {
+        // History is loaded via API
+      } else if (panelName === 'stats') {
+        statsPanel.classList.remove('hidden');
+      }
+    }
+
+    /* ====== Local history ====== */
     function loadHistory() {
       const h = JSON.parse(localStorage.getItem('scan_history') || '[]');
       renderHistory(h);
@@ -388,6 +544,94 @@
       });
     }
 
+    /* ====== Server history ====== */
+    async function loadHistoryFromServer() {
+      try {
+        const res = await fetch(`${backendUrl}/get-history?limit=20`);
+        const data = await res.json();
+        if (data.history) {
+          renderServerHistory(data.history);
+        }
+      } catch (error) {
+        console.error('Failed to load server history:', error);
+      }
+    }
+
+    function renderServerHistory(history) {
+      const s = STR[getUILang()];
+      historyList.innerHTML = '';
+      if (!history.length) {
+        historyList.innerHTML = `<li class="text-xs text-gray-400">${escapeHtml(s.noScan)}</li>`;
+        return;
+      }
+      history.forEach((item) => {
+        const li = document.createElement('li');
+        const date = new Date(item.scan_date).toLocaleString();
+        li.innerHTML = `
+          <button class="w-full text-left text-sm px-2 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="font-medium">${escapeHtml(item.filename)}</div>
+            <div class="text-xs text-gray-500 flex justify-between">
+              <span>${escapeHtml(date)}</span>
+              <span class="font-semibold ${item.overall_score > 50 ? 'text-red-600' : item.overall_score > 20 ? 'text-yellow-600' : 'text-green-600'}">
+                ${item.overall_score}%
+              </span>
+            </div>
+          </button>
+        `;
+        historyList.appendChild(li);
+      });
+    }
+
+    /* ====== Statistics ====== */
+    async function loadStats() {
+      try {
+        const res = await fetch(`${backendUrl}/stats`);
+        const data = await res.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        statsTotalScans.textContent = data.total_scans || 0;
+        statsAvgScore.textContent = `${data.average_score || 0}%`;
+        statsTodayScans.textContent = data.today_scans || 0;
+        totalScansBadge.textContent = `${data.total_scans || 0} scans`;
+        totalScansBadge.parentElement.classList.remove('hidden');
+        
+        // Load recent activity
+        await loadRecentActivity();
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+      }
+    }
+
+    async function loadRecentActivity() {
+      try {
+        const res = await fetch(`${backendUrl}/get-history?limit=10`);
+        const data = await res.json();
+        
+        if (data.history) {
+          recentActivity.innerHTML = '';
+          data.history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'p-2 rounded-lg bg-gray-50 dark:bg-gray-900 text-sm';
+            div.innerHTML = `
+              <div class="flex justify-between">
+                <span class="font-medium truncate">${escapeHtml(item.filename)}</span>
+                <span class="font-semibold ${item.overall_score > 50 ? 'text-red-600' : item.overall_score > 20 ? 'text-yellow-600' : 'text-green-600'}">
+                  ${item.overall_score}%
+                </span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                ${new Date(item.scan_date).toLocaleString()}
+              </div>
+            `;
+            recentActivity.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load recent activity:', error);
+      }
+    }
+
     /* ====== corpus count ====== */
     async function fetchCorpusCount() {
       try {
@@ -410,6 +654,8 @@
         checkTextBtn.disabled = true;
         uploadProgress.classList.add('hidden');
         resultsPanel.classList.add('hidden');
+        aiDetectionPanel.classList.add('hidden');
+        citationsPanel.classList.add('hidden');
         summaryBox.innerHTML = `<div class="text-sm text-gray-500">${escapeHtml(msg)}</div>`;
       } else {
         checkTextBtn.disabled = false;
@@ -441,6 +687,7 @@
         window.__lastResult = j;
         renderResults(j);
         saveToHistory({ label: 'Text scan', date: new Date().toLocaleString(), data: j });
+        await loadStats(); // Refresh stats
       } catch (err) {
         setLoading(false);
         alert('Could not reach backend. Is the server running?');
@@ -497,12 +744,64 @@
         window.__lastResult = result;
         renderResults(result);
         saveToHistory({ label: `File: ${file.name}`, date: new Date().toLocaleString(), data: result });
+        await loadStats(); // Refresh stats
       } catch(e) {
         setLoading(false);
         alert('Upload or scan failed: ' + (e.message || e));
         console.error(e);
       }
     }
+
+    /* ====== batch upload ====== */
+    batchFileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+      
+      const s = STR[getUILang()];
+      batchProgress.classList.remove('hidden');
+      batchStatus.textContent = `Processing ${files.length} files...`;
+      
+      let completed = 0;
+      const results = [];
+      
+      for (const file of files) {
+        try {
+          batchStatus.textContent = `Processing ${file.name}...`;
+          batchProgressBar.style.width = `${(completed / files.length) * 100}%`;
+          
+          const language = document.getElementById('languageSelect').value;
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('language', language || 'auto');
+          
+          const res = await fetch(`${backendUrl}/check-file`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (res.ok) {
+            const result = await res.json();
+            results.push({ filename: file.name, result });
+            completed++;
+            batchProgressBar.style.width = `${(completed / files.length) * 100}%`;
+          }
+        } catch (error) {
+          console.error(`Failed to process ${file.name}:`, error);
+        }
+      }
+      
+      batchStatus.textContent = `Completed ${completed}/${files.length} files`;
+      setTimeout(() => {
+        batchProgress.classList.add('hidden');
+        batchProgressBar.style.width = '0%';
+      }, 2000);
+      
+      // Show summary of batch results
+      if (results.length > 0) {
+        const totalScore = results.reduce((sum, r) => sum + r.result.overall_score, 0) / results.length;
+        alert(`Batch processing complete!\n\nFiles processed: ${results.length}\nAverage similarity: ${totalScore.toFixed(2)}%\n\nCheck individual files for detailed results.`);
+      }
+    });
 
     /* ====== dropzone ====== */
     dropZone.addEventListener('click', ()=> fileInput.click());
@@ -553,12 +852,31 @@
       resultsContent.innerHTML = '';
 
       const score = data.overall_score ?? 0;
-      let colorClass = 'text-green-600 bg-green-50';
-      if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50';
-      else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50';
+      let colorClass = 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-300';
+      if (score > SCORE_THRESHOLDS.med) colorClass = 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-300';
+      else if (score > SCORE_THRESHOLDS.low) colorClass = 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-300';
 
       overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${colorClass}`;
       overallBadge.textContent = `${score}% — ${data.message || ''}`;
+
+      // Show AI Detection
+      if (data.ai_analysis) {
+        aiDetectionPanel.classList.remove('hidden');
+        aiProbability.textContent = `${data.ai_analysis.ai_probability}%`;
+        aiConfidence.textContent = data.ai_analysis.confidence;
+        aiStatus.textContent = data.ai_analysis.is_ai_generated ? 'AI Detected' : 'Human-like';
+        
+        if (data.ai_analysis.is_ai_generated) {
+          aiWarning.classList.remove('hidden');
+          aiWarningText.textContent = s.aiWarning;
+          aiBadge.textContent = 'AI Detected';
+          aiBadge.className = 'text-sm font-semibold px-3 py-1 rounded-lg bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+        } else {
+          aiWarning.classList.add('hidden');
+          aiBadge.textContent = 'Human-like';
+          aiBadge.className = 'text-sm font-semibold px-3 py-1 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        }
+      }
 
       const usedTranslation = !!data.used_translation;
       const detected = data.detected_language || data.requested_language || 'auto';
@@ -569,6 +887,8 @@
         ${usedTranslation ? `<div class="mt-1 text-xs text-purple-700 dark:text-purple-300">${escapeHtml(s.translated(detected))}</div>` : ''}
       `;
 
+      // Collect all matches for citations
+      const allMatches = [];
       const details = data.details || [];
       details.forEach((d, idx) => {
         const sim = (d.best_similarity ?? 0) * 100;
@@ -580,7 +900,6 @@
         const card = document.createElement('div');
         card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
 
-        // ✅ THIS is the important part: highlights come from backend as d.highlights
         const chunkHtml = renderWithHighlights(d.chunk_text || '', d.highlights || []);
 
         card.innerHTML = `
@@ -592,6 +911,7 @@
         `;
 
         if (d.matches && d.matches.length) {
+          allMatches.push(...d.matches);
           const ul = document.createElement('ul');
           ul.className = 'mt-3 text-xs list-disc ml-5';
 
@@ -627,8 +947,99 @@
         resultsContent.appendChild(card);
       });
 
+      // Generate citations if there are matches
+      if (allMatches.length > 0) {
+        generateCitations(allMatches, 'apa');
+      } else {
+        citationsPanel.classList.add('hidden');
+      }
+
       resultsPanel.scrollIntoView({ behavior: 'smooth' });
     }
+
+    /* ====== citations ====== */
+    async function generateCitations(matches, style = 'apa') {
+      const s = STR[getUILang()];
+      citationsPanel.classList.remove('hidden');
+      citationsList.innerHTML = '<div class="text-center text-gray-500">Generating citations...</div>';
+      
+      try {
+        const res = await fetch(`${backendUrl}/generate-citations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matches, style })
+        });
+        const data = await res.json();
+        
+        if (data.citations && data.citations.length > 0) {
+          citationsList.innerHTML = '';
+          data.citations.forEach((cite, index) => {
+            const div = document.createElement('div');
+            div.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border dark:border-gray-700';
+            div.innerHTML = `
+              <div class="text-sm">${escapeHtml(cite.text)}</div>
+              <div class="mt-2 flex justify-between text-xs">
+                <span class="text-gray-500">Similarity: ${((cite.similarity || 0) * 100).toFixed(2)}%</span>
+                <a href="${escapeHtml(cite.url)}" target="_blank" class="text-purple-accent hover:underline">View Source</a>
+              </div>
+            `;
+            citationsList.appendChild(div);
+          });
+        } else {
+          citationsList.innerHTML = '<div class="text-center text-gray-500">No citations generated</div>';
+        }
+      } catch (error) {
+        console.error('Failed to generate citations:', error);
+        citationsList.innerHTML = '<div class="text-center text-red-500">Failed to generate citations</div>';
+      }
+    }
+
+    // Citation style buttons
+    apaBtn.addEventListener('click', () => {
+      apaBtn.className = 'px-3 py-1 rounded-lg bg-purple-accent text-white text-sm hover:opacity-95';
+      mlaBtn.className = 'px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600';
+      if (window.__lastResult) {
+        const allMatches = [];
+        window.__lastResult.details?.forEach(d => {
+          if (d.matches) allMatches.push(...d.matches);
+        });
+        generateCitations(allMatches, 'apa');
+      }
+    });
+
+    mlaBtn.addEventListener('click', () => {
+      mlaBtn.className = 'px-3 py-1 rounded-lg bg-purple-accent text-white text-sm hover:opacity-95';
+      apaBtn.className = 'px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600';
+      if (window.__lastResult) {
+        const allMatches = [];
+        window.__lastResult.details?.forEach(d => {
+          if (d.matches) allMatches.push(...d.matches);
+        });
+        generateCitations(allMatches, 'mla');
+      }
+    });
+
+    // Copy citations button
+    copyCitationsBtn.addEventListener('click', () => {
+      const citations = Array.from(citationsList.querySelectorAll('div.text-sm'))
+        .map(div => div.textContent)
+        .join('\n\n');
+      
+      navigator.clipboard.writeText(citations)
+        .then(() => {
+          const originalText = copyCitationsBtn.textContent;
+          copyCitationsBtn.textContent = 'Copied!';
+          copyCitationsBtn.className = 'px-3 py-1 rounded-lg bg-green-600 text-white text-sm';
+          setTimeout(() => {
+            copyCitationsBtn.textContent = originalText;
+            copyCitationsBtn.className = 'px-3 py-1 rounded-lg bg-green-600 text-white text-sm hover:opacity-95';
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy:', err);
+          alert('Failed to copy citations to clipboard');
+        });
+    });
 
     /* ====== scrape + rebuild ====== */
     scrapeBtn.addEventListener('click', async () => {
@@ -673,6 +1084,7 @@
       }
     }
 
+    /* ====== Event Listeners ====== */
     rebuildBtn.addEventListener('click', rebuildIndex);
     rebuildSmallBtn.addEventListener('click', rebuildIndex);
     checkTextBtn.addEventListener('click', checkText);
@@ -681,13 +1093,15 @@
       return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
     }
 
-    // Init
+    // Initialization
     loadHistory();
     fetchCorpusCount();
     applyLangUI();
+    loadStats(); // Load initial stats
   </script>
 </body>
 </html>
+
 
 
 
