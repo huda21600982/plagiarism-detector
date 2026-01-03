@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -19,16 +20,14 @@
         }
       }
     }
-   <script>
-    const backendUrl = "http://127.0.0.1:5000";
+  </script>
 
-    // THEME toggle (shared across pages)
-    const themeToggle = document.getElementById('themeToggle');
-    
-    // Initialize theme on load
-    function initTheme() {
-      const savedTheme = localStorage.getItem('theme');
-      const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  <!-- THEME: apply before paint (no flicker) -->
+  <script>
+    (function () {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = saved === 'dark' || (!saved && prefersDark);
       
       if (isDark) {
         document.documentElement.classList.add('dark');
@@ -37,110 +36,7 @@
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');
       }
-    }
-    
-    // Toggle theme function
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.contains('dark');
-      
-      if (isDark) {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-    
-    // Apply theme on page load
-    initTheme();
-    themeToggle.addEventListener('click', toggleTheme);
-
-    // Tabs
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const authMessage = document.getElementById('authMessage');
-
-    tabLogin.addEventListener('click', () => {
-      tabLogin.classList.add('border-purple-accent','text-purple-accent');
-      tabLogin.classList.remove('text-gray-400');
-      tabRegister.classList.remove('border-purple-accent','text-purple-accent');
-      tabRegister.classList.add('text-gray-400');
-      loginForm.classList.remove('hidden');
-      registerForm.classList.add('hidden');
-      authMessage.textContent = '';
-    });
-
-    tabRegister.addEventListener('click', () => {
-      tabRegister.classList.add('border-purple-accent','text-purple-accent');
-      tabRegister.classList.remove('text-gray-400');
-      tabLogin.classList.remove('border-purple-accent','text-purple-accent');
-      tabLogin.classList.add('text-gray-400');
-      registerForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-      authMessage.textContent = '';
-    });
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authMessage.textContent = 'Logging in...';
-      const username = document.getElementById('loginUsername').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const res = await fetch(`${backendUrl}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const j = await res.json();
-        if (!res.ok || j.error) {
-          authMessage.textContent = j.error || 'Login failed.';
-          authMessage.classList.add('text-red-500');
-          return;
-        }
-        localStorage.setItem('current_user', j.username);
-        authMessage.textContent = 'Login successful. Redirecting...';
-        authMessage.classList.remove('text-red-500');
-        authMessage.classList.add('text-green-600');
-        setTimeout(() => window.location.href = 'dashboard.html', 500);
-      } catch (err) {
-        console.error(err);
-        authMessage.textContent = 'Could not reach backend.';
-        authMessage.classList.add('text-red-500');
-      }
-    });
-
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authMessage.textContent = 'Creating account...';
-      const username = document.getElementById('regUsername').value.trim();
-      const password = document.getElementById('regPassword').value;
-
-      try {
-        const res = await fetch(`${backendUrl}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const j = await res.json();
-        if (!res.ok || j.error) {
-          authMessage.textContent = j.error || 'Registration failed.';
-          authMessage.classList.add('text-red-500');
-          return;
-        }
-        authMessage.textContent = 'Account created. Now login.';
-        authMessage.classList.remove('text-red-500');
-        authMessage.classList.add('text-green-600');
-        tabLogin.click();
-      } catch (err) {
-        console.error(err);
-        authMessage.textContent = 'Could not reach backend.';
-        authMessage.classList.add('text-red-500');
-      }
-    });
+    })();
   </script>
 </head>
 
@@ -151,15 +47,20 @@
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">AI</div>
         <div>
-          <div class="font-extrabold text-lg">PlagAware</div>
+          <div class="font-extrabold text-lg text-gray-900 dark:text-white">PlagAware</div>
           <div class="text-xs text-gray-500 dark:text-gray-400">AI-powered plagiarism detection</div>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
         <button id="themeToggle" class="p-2 rounded-md bg-gray-100 dark:bg-gray-800" title="Toggle day/night">
-          <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+          <!-- Sun icon -->
+          <svg id="sunIcon" class="w-5 h-5 text-yellow-500 hidden" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+          </svg>
+          <!-- Moon icon -->
+          <svg id="moonIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
           </svg>
         </button>
 
@@ -175,7 +76,7 @@
 
   <main class="max-w-5xl mx-auto px-4 py-10 grid gap-10 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)] items-center">
     <section>
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
         AI-based <span class="text-purple-accent">Plagiarism Detection</span> for student work
       </h1>
 
@@ -197,6 +98,14 @@
           <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
           <span>Shows matched sources with URL + page title.</span>
         </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
+          <span>Detects AI-generated content using RoBERTa models.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
+          <span>Batch upload support for multiple files at once.</span>
+        </li>
       </ul>
 
       <div class="mt-8 flex flex-wrap gap-3">
@@ -211,25 +120,25 @@
     </section>
 
     <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow">
-      <h2 class="text-lg font-semibold">Sign in</h2>
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Sign in</h2>
       <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Demo login stored locally on backend (users.json).</p>
 
       <div class="mt-4 flex text-xs border-b border-gray-200 dark:border-gray-800">
         <button id="tabLogin" class="flex-1 py-2 text-center font-semibold border-b-2 border-purple-accent text-purple-accent">Login</button>
-        <button id="tabRegister" class="flex-1 py-2 text-center text-gray-400 border-b-2 border-transparent">Register</button>
+        <button id="tabRegister" class="flex-1 py-2 text-center text-gray-400 dark:text-gray-500 border-b-2 border-transparent">Register</button>
       </div>
 
       <form id="loginForm" class="mt-4 space-y-3">
         <div>
           <label class="text-xs text-gray-600 dark:text-gray-300">Username</label>
           <input id="loginUsername" type="text"
-                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none"
+                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none text-gray-900 dark:text-white"
                  required>
         </div>
         <div>
           <label class="text-xs text-gray-600 dark:text-gray-300">Password</label>
           <input id="loginPassword" type="password"
-                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none"
+                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none text-gray-900 dark:text-white"
                  required>
         </div>
         <button type="submit" class="w-full bg-purple-accent rounded-lg py-2 text-sm font-semibold text-white hover:opacity-95">Login</button>
@@ -239,13 +148,13 @@
         <div>
           <label class="text-xs text-gray-600 dark:text-gray-300">Choose a username</label>
           <input id="regUsername" type="text"
-                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none"
+                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none text-gray-900 dark:text-white"
                  required>
         </div>
         <div>
           <label class="text-xs text-gray-600 dark:text-gray-300">Choose a password</label>
           <input id="regPassword" type="password"
-                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none"
+                 class="mt-1 w-full rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none text-gray-900 dark:text-white"
                  required>
         </div>
         <button type="submit" class="w-full bg-purple-accent rounded-lg py-2 text-sm font-semibold text-white hover:opacity-95">Create Account</button>
@@ -256,23 +165,51 @@
   </main>
 
   <footer class="pb-6 text-center text-[11px] text-gray-500 dark:text-gray-400">
-    Local Flask + FAISS prototype • Final year project UI
+    Local Flask + FAISS prototype • Final year project UI • AI-Powered Plagiarism Detection
   </footer>
 
   <script>
     const backendUrl = "http://127.0.0.1:5000";
 
-    // THEME toggle (shared across pages)
+    // THEME toggle
     const themeToggle = document.getElementById('themeToggle');
-    function applyTheme(mode) {
-      if (mode === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', mode);
+    
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      }
     }
-    themeToggle.addEventListener('click', () => {
+    
+    function toggleTheme() {
       const isDark = document.documentElement.classList.contains('dark');
-      applyTheme(isDark ? 'light' : 'dark');
-    });
+      
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      }
+    }
+    
+    initTheme();
+    themeToggle.addEventListener('click', toggleTheme);
 
     // Tabs
     const tabLogin = document.getElementById('tabLogin');
@@ -283,9 +220,9 @@
 
     tabLogin.addEventListener('click', () => {
       tabLogin.classList.add('border-purple-accent','text-purple-accent');
-      tabLogin.classList.remove('text-gray-400');
+      tabLogin.classList.remove('text-gray-400', 'dark:text-gray-500');
       tabRegister.classList.remove('border-purple-accent','text-purple-accent');
-      tabRegister.classList.add('text-gray-400');
+      tabRegister.classList.add('text-gray-400', 'dark:text-gray-500');
       loginForm.classList.remove('hidden');
       registerForm.classList.add('hidden');
       authMessage.textContent = '';
@@ -293,9 +230,9 @@
 
     tabRegister.addEventListener('click', () => {
       tabRegister.classList.add('border-purple-accent','text-purple-accent');
-      tabRegister.classList.remove('text-gray-400');
+      tabRegister.classList.remove('text-gray-400', 'dark:text-gray-500');
       tabLogin.classList.remove('border-purple-accent','text-purple-accent');
-      tabLogin.classList.add('text-gray-400');
+      tabLogin.classList.add('text-gray-400', 'dark:text-gray-500');
       registerForm.classList.remove('hidden');
       loginForm.classList.add('hidden');
       authMessage.textContent = '';
@@ -304,6 +241,7 @@
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       authMessage.textContent = 'Logging in...';
+      authMessage.classList.remove('text-red-500', 'text-green-600');
       const username = document.getElementById('loginUsername').value.trim();
       const password = document.getElementById('loginPassword').value;
 
@@ -334,6 +272,7 @@
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       authMessage.textContent = 'Creating account...';
+      authMessage.classList.remove('text-red-500', 'text-green-600');
       const username = document.getElementById('regUsername').value.trim();
       const password = document.getElementById('regPassword').value;
 
