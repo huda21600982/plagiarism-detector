@@ -19,16 +19,128 @@
         }
       }
     }
-  </script>
+   <script>
+    const backendUrl = "http://127.0.0.1:5000";
 
-  <!-- THEME: apply before paint (no flicker) -->
-  <script>
-    (function () {
-      const saved = localStorage.getItem('theme'); // 'dark' | 'light'
-      if (saved === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-      if (!saved) localStorage.setItem('theme', 'light');
-    })();
+    // THEME toggle (shared across pages)
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Initialize theme on load
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    
+    // Toggle theme function
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    
+    // Apply theme on page load
+    initTheme();
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Tabs
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authMessage = document.getElementById('authMessage');
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.classList.add('border-purple-accent','text-purple-accent');
+      tabLogin.classList.remove('text-gray-400');
+      tabRegister.classList.remove('border-purple-accent','text-purple-accent');
+      tabRegister.classList.add('text-gray-400');
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+      authMessage.textContent = '';
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.classList.add('border-purple-accent','text-purple-accent');
+      tabRegister.classList.remove('text-gray-400');
+      tabLogin.classList.remove('border-purple-accent','text-purple-accent');
+      tabLogin.classList.add('text-gray-400');
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      authMessage.textContent = '';
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authMessage.textContent = 'Logging in...';
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(`${backendUrl}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const j = await res.json();
+        if (!res.ok || j.error) {
+          authMessage.textContent = j.error || 'Login failed.';
+          authMessage.classList.add('text-red-500');
+          return;
+        }
+        localStorage.setItem('current_user', j.username);
+        authMessage.textContent = 'Login successful. Redirecting...';
+        authMessage.classList.remove('text-red-500');
+        authMessage.classList.add('text-green-600');
+        setTimeout(() => window.location.href = 'dashboard.html', 500);
+      } catch (err) {
+        console.error(err);
+        authMessage.textContent = 'Could not reach backend.';
+        authMessage.classList.add('text-red-500');
+      }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authMessage.textContent = 'Creating account...';
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        const res = await fetch(`${backendUrl}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const j = await res.json();
+        if (!res.ok || j.error) {
+          authMessage.textContent = j.error || 'Registration failed.';
+          authMessage.classList.add('text-red-500');
+          return;
+        }
+        authMessage.textContent = 'Account created. Now login.';
+        authMessage.classList.remove('text-red-500');
+        authMessage.classList.add('text-green-600');
+        tabLogin.click();
+      } catch (err) {
+        console.error(err);
+        authMessage.textContent = 'Could not reach backend.';
+        authMessage.classList.add('text-red-500');
+      }
+    });
   </script>
 </head>
 
