@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -35,13 +36,20 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.7; }
     }
+    
+    /* Dark mode fixes */
+    .dark .dark\:bg-gray-900 { background-color: #111827; }
+    .dark .dark\:bg-gray-800 { background-color: #1f2937; }
+    .dark .dark\:text-gray-100 { color: #f3f4f6; }
+    .dark .dark\:text-gray-300 { color: #d1d5db; }
+    .dark .dark\:border-gray-700 { border-color: #374151; }
   </style>
 </head>
 
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+<body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
 
   <!-- TOP NAVBAR -->
-  <nav class="bg-white/90 dark:bg-gray-900/90 border-b dark:border-gray-800 backdrop-blur sticky top-0 z-20">
+  <nav class="bg-white/90 border-b border-gray-200 backdrop-blur sticky top-0 z-20 dark:bg-gray-900/90 dark:border-gray-800">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div class="w-9 h-9 rounded-lg bg-purple-accent text-white flex items-center justify-center font-bold text-lg">
@@ -62,12 +70,12 @@
         </a>
 
         <!-- Arabic toggle -->
-        <button id="uiLangToggle" class="px-3 py-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+        <button id="uiLangToggle" class="px-3 py-1 rounded-lg border border-gray-300 bg-white text-xs dark:bg-gray-800 dark:border-gray-700">
           AR
         </button>
         
         <!-- Stats Badge -->
-        <div id="statsBadge" class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs">
+        <div id="statsBadge" class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-green-50 text-green-700 text-xs dark:bg-green-900/20 dark:text-green-300">
           <span id="totalScans">0</span> scans
         </div>
       </div>
@@ -78,7 +86,7 @@
   <div class="min-h-screen flex">
 
     <!-- SIDEBAR -->
-    <aside class="w-72 bg-white dark:bg-gray-800 border-r dark:border-gray-700 hidden md:block">
+    <aside class="w-72 bg-white border-r border-gray-200 hidden md:block dark:bg-gray-800 dark:border-gray-700">
       <div class="p-6">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-lg bg-purple-accent flex items-center justify-center text-white font-bold">AI</div>
@@ -102,21 +110,21 @@
         </div>
 
         <!-- Batch Upload Section -->
-        <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <div class="mt-8 p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
           <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Batch Upload</p>
           <input type="file" id="batchFileInput" multiple class="hidden" accept=".pdf,.docx,.txt">
-          <label for="batchFileInput" class="block w-full text-center px-3 py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
+          <label for="batchFileInput" class="block w-full text-center px-3 py-2 rounded-lg border border-dashed border-gray-300 text-sm cursor-pointer hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">
             📁 Upload Multiple Files
           </label>
           <div id="batchProgress" class="mt-2 hidden">
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
               <div id="batchProgressBar" class="bg-purple-accent h-2 rounded-full" style="width: 0%"></div>
             </div>
-            <div id="batchStatus" class="text-xs text-gray-500 mt-1"></div>
+            <div id="batchStatus" class="text-xs text-gray-500 mt-1 dark:text-gray-400"></div>
           </div>
         </div>
 
-        <div class="mt-8 text-xs text-gray-400">AI Detection • Citation Generation • Multi-Language</div>
+        <div class="mt-8 text-xs text-gray-400 dark:text-gray-500">AI Detection • Citation Generation • Multi-Language</div>
       </div>
     </aside>
 
@@ -130,7 +138,7 @@
         </div>
 
         <div class="flex items-center space-x-4">
-          <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+          <div class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <label id="langLabel" class="text-xs text-gray-500 dark:text-gray-400 mr-2">Language (we'll translate)</label>
             <select id="languageSelect" class="text-sm bg-transparent outline-none">
               <option value="auto">Detect</option>
@@ -146,14 +154,12 @@
           </div>
 
           <div class="flex items-center space-x-3">
-            <button id="themeToggle" class="p-2 rounded-md bg-white dark:bg-gray-800 shadow-sm" title="Toggle theme">
-              <!-- Sun icon for light mode -->
-              <svg id="sunIcon" class="w-5 h-5 text-yellow-500 hidden" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+            <button id="themeToggle" class="p-2 rounded-md bg-gray-100 shadow-sm dark:bg-gray-800" title="Toggle theme">
+              <svg id="sunIcon" class="w-5 h-5 text-yellow-500 hidden" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
               </svg>
-              <!-- Moon icon for dark mode -->
-              <svg id="moonIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zM5.636 4.222a1 1 0 1 1 1.414-1.414L8.05 4.81a1 1 0 0 1-1.414 1.414L5.636 4.222zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1z"/>
+              <svg id="moonIcon" class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
               </svg>
             </button>
           </div>
@@ -162,20 +168,20 @@
 
       <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+        <section class="lg:col-span-2 bg-white rounded-xl p-6 shadow dark:bg-gray-800">
           <div class="flex items-start justify-between">
             <h3 id="pasteTitle" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Paste text</h3>
             <div id="limitText" class="text-sm text-gray-500 dark:text-gray-400">Up to 10,000 chars</div>
           </div>
 
           <textarea id="inputText" maxlength="10000" rows="10"
-            class="w-full mt-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-900 text-sm"
+            class="w-full mt-4 p-4 rounded-lg border border-gray-300 text-sm dark:border-gray-700 dark:bg-gray-900"
             placeholder="Paste your text here..."></textarea>
 
           <div class="mt-4 flex items-center gap-3">
             <button id="checkTextBtn" class="px-5 py-2 rounded-lg bg-purple-accent text-white font-semibold hover:opacity-95">Check Text</button>
 
-            <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed cursor-pointer text-sm text-gray-700 dark:text-gray-200 hover:bg-purple-accent-2/20">
+            <label id="dropZone" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-purple-accent-2/10 border border-dashed border-gray-300 cursor-pointer text-sm text-gray-700 hover:bg-purple-accent-2/20 dark:border-gray-700 dark:text-gray-200">
               <input id="fileInput" type="file" accept=".pdf,.docx,.txt" class="hidden" />
               <svg class="w-5 h-5 text-purple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 018 0v8"/>
@@ -183,17 +189,17 @@
               <span id="dropLabel">Drag & drop or click to upload</span>
             </label>
 
-            <div id="uploadProgress" class="hidden w-48 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div id="uploadProgress" class="hidden w-48 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-700">
               <div id="uploadBar" class="h-2 bg-purple-accent" style="width:0%"></div>
             </div>
           </div>
 
-          <div class="mt-5 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border dark:border-gray-700">
+          <div class="mt-5 p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
             <label id="scrapeLabel" class="text-sm font-medium">Add online sources to corpus (one URL per line)</label>
-            <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border dark:bg-gray-900 text-sm" placeholder="https://example.com/article"></textarea>
+            <textarea id="urlList" rows="2" class="mt-2 w-full p-2 rounded border border-gray-300 text-sm dark:bg-gray-900" placeholder="https://example.com/article"></textarea>
             <div class="mt-3 flex gap-3">
               <button id="scrapeBtn" class="px-4 py-2 rounded-lg bg-purple-accent text-white hover:opacity-95">Add to Corpus</button>
-              <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800">Rebuild Index</button>
+              <button id="rebuildSmallBtn" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">Rebuild Index</button>
             </div>
             <p id="scrapeHint" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
               Adding URLs will attempt to scrape and save articles to the corpus directory on the server.
@@ -201,7 +207,7 @@
           </div>
         </section>
 
-        <aside class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow space-y-4">
+        <aside class="bg-white rounded-xl p-4 shadow space-y-4 dark:bg-gray-800">
           <div>
             <h4 id="summaryTitle" class="text-sm font-semibold text-gray-800 dark:text-gray-100">Scan Summary</h4>
             <div id="summaryBox" class="mt-3 text-sm text-gray-600 dark:text-gray-300">No scan yet</div>
@@ -224,10 +230,10 @@
       </div>
 
       <!-- AI Detection Panel -->
-      <section id="aiDetectionPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+      <section id="aiDetectionPanel" class="mt-6 bg-white rounded-xl p-6 shadow hidden dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold">🤖 AI-Generated Text Analysis</h3>
-          <div id="aiBadge" class="text-sm font-semibold px-3 py-1 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">—</div>
+          <div id="aiBadge" class="text-sm font-semibold px-3 py-1 rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">—</div>
         </div>
         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
@@ -243,7 +249,7 @@
             <div id="aiStatus" class="text-lg font-semibold mt-1">Analyzing...</div>
           </div>
         </div>
-        <div id="aiWarning" class="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hidden ai-warning">
+        <div id="aiWarning" class="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 hidden ai-warning dark:bg-red-900/20 dark:border-red-800">
           <div class="flex items-center gap-2 text-red-700 dark:text-red-300">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -255,7 +261,7 @@
       </section>
 
       <!-- Results Panel -->
-      <section id="resultsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+      <section id="resultsPanel" class="mt-6 bg-white rounded-xl p-6 shadow hidden dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <h3 id="resultsTitle" class="text-lg font-semibold">Scan Results</h3>
           <div id="overallBadge" class="text-sm font-semibold px-3 py-1 rounded-lg">—</div>
@@ -265,12 +271,12 @@
       </section>
 
       <!-- Citations Panel -->
-      <section id="citationsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+      <section id="citationsPanel" class="mt-6 bg-white rounded-xl p-6 shadow hidden dark:bg-gray-800">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">📚 Citations</h3>
           <div class="flex gap-2">
             <button id="apaBtn" class="px-3 py-1 rounded-lg bg-purple-accent text-white text-sm hover:opacity-95">APA</button>
-            <button id="mlaBtn" class="px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600">MLA</button>
+            <button id="mlaBtn" class="px-3 py-1 rounded-lg bg-gray-200 text-sm hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">MLA</button>
             <button id="copyCitationsBtn" class="px-3 py-1 rounded-lg bg-green-600 text-white text-sm hover:opacity-95">
               Copy All
             </button>
@@ -282,7 +288,7 @@
       </section>
 
       <!-- Statistics Panel -->
-      <section id="statsPanel" class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow hidden">
+      <section id="statsPanel" class="mt-6 bg-white rounded-xl p-6 shadow hidden dark:bg-gray-800">
         <h3 class="text-lg font-semibold mb-4">📊 Statistics</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
@@ -316,6 +322,44 @@
     const UI_LANG_KEY = "ui_lang";
     window.__lastResult = null;
     let currentUser = localStorage.getItem('current_user') || 'anonymous';
+
+    /* ====== FIXED Day/Night Mode ====== */
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      }
+    }
+    
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      }
+    }
+    
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    initTheme();
 
     /* ====== i18n strings (English/Arabic) ====== */
     const STR = {
@@ -432,39 +476,11 @@
       if (!window.__lastResult) summaryBox.textContent = s.noScan;
     }
 
-    /* ====== Theme Toggle FIXED ====== */
-    function initTheme() {
-      const savedTheme = localStorage.getItem('theme');
-      const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('sunIcon').classList.add('hidden');
-        document.getElementById('moonIcon').classList.remove('hidden');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-        document.getElementById('sunIcon').classList.remove('hidden');
-        document.getElementById('moonIcon').classList.add('hidden');
-      }
-    }
-
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.contains('dark');
-      
-      if (isDark) {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-        document.getElementById('sunIcon').classList.remove('hidden');
-        document.getElementById('moonIcon').classList.add('hidden');
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('sunIcon').classList.add('hidden');
-        document.getElementById('moonIcon').classList.remove('hidden');
-      }
-    }
+    document.getElementById("uiLangToggle").addEventListener("click", () => {
+      const next = (getUILang() === "en") ? "ar" : "en";
+      setUILang(next);
+      applyLangUI();
+    });
 
     /* ====== DOM refs ====== */
     const inputText = document.getElementById('inputText');
@@ -485,7 +501,6 @@
     const scrapeBtn = document.getElementById('scrapeBtn');
     const rebuildBtn = document.getElementById('rebuildBtn');
     const rebuildSmallBtn = document.getElementById('rebuildSmallBtn');
-    const themeToggle = document.getElementById('themeToggle');
     const batchFileInput = document.getElementById('batchFileInput');
     const batchProgress = document.getElementById('batchProgress');
     const batchProgressBar = document.getElementById('batchProgressBar');
@@ -508,17 +523,6 @@
     const statsTodayScans = document.getElementById('statsTodayScans');
     const recentActivity = document.getElementById('recentActivity');
     const totalScansBadge = document.getElementById('totalScans');
-
-    /* ====== Theme toggle ====== */
-    themeToggle.addEventListener('click', toggleTheme);
-    initTheme(); // Initialize theme on load
-
-    /* ====== Arabic toggle ====== */
-    document.getElementById("uiLangToggle").addEventListener("click", () => {
-      const next = (getUILang() === "en") ? "ar" : "en";
-      setUILang(next);
-      applyLangUI();
-    });
 
     /* ====== Navigation ====== */
     document.getElementById('nav_scan').addEventListener('click', () => {
@@ -787,7 +791,7 @@
       }
     }
 
-    /* ====== FIXED batch upload ====== */
+    /* ====== FIXED Multiple File Upload ====== */
     batchFileInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
@@ -799,16 +803,16 @@
       let completed = 0;
       const results = [];
       
+      // Process each file individually
       for (const file of files) {
         try {
           batchStatus.textContent = `Processing ${file.name}...`;
           batchProgressBar.style.width = `${(completed / files.length) * 100}%`;
           
-          // Use the single file upload endpoint for each file
-          const language = document.getElementById('languageSelect').value;
+          // Use FormData to send file
           const formData = new FormData();
           formData.append('file', file);
-          formData.append('language', language || 'auto');
+          formData.append('language', document.getElementById('languageSelect').value || 'auto');
           
           const res = await fetch(`${backendUrl}/check-file`, {
             method: 'POST',
@@ -817,103 +821,151 @@
           
           if (res.ok) {
             const result = await res.json();
-            results.push({ filename: file.name, ...result });
+            results.push({
+              filename: file.name,
+              ...result
+            });
             completed++;
             batchProgressBar.style.width = `${(completed / files.length) * 100}%`;
+          } else {
+            console.error(`Failed to process ${file.name}:`, res.status);
           }
         } catch (error) {
-          console.error(`Failed to process ${file.name}:`, error);
+          console.error(`Error processing ${file.name}:`, error);
         }
       }
       
       batchStatus.textContent = `Completed ${completed}/${files.length} files`;
       
-      // Show results for each file
+      // Display results
       if (results.length > 0) {
-        // Clear previous results
-        resultsPanel.classList.remove('hidden');
-        resultsContent.innerHTML = '';
-        
-        // Display each file's results
-        results.forEach((result, index) => {
-          const card = document.createElement('div');
-          card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 mb-4';
-          
-          card.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-              <div class="font-medium text-sm">${escapeHtml(result.filename)}</div>
-              <div class="text-sm font-semibold ${result.overall_score > 50 ? 'text-red-600' : result.overall_score > 20 ? 'text-yellow-600' : 'text-green-600'}">
-                ${result.overall_score}%
-              </div>
-            </div>
-            <div class="text-xs text-gray-500 mb-2">${escapeHtml(result.message || '')}</div>
-            <div class="text-xs">
-              <span class="font-medium">Chunks:</span> ${result.total_chunks || 0} | 
-              <span class="font-medium">AI Probability:</span> ${result.ai_analysis?.ai_probability || 0}%
-            </div>
-            <button class="mt-2 text-xs text-purple-accent hover:underline view-details-btn" data-index="${index}">
-              View Details
-            </button>
-            <div class="file-details hidden mt-3" id="details-${index}"></div>
-          `;
-          
-          resultsContent.appendChild(card);
-        });
-        
-        // Add event listeners for view details buttons
-        document.querySelectorAll('.view-details-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const index = this.getAttribute('data-index');
-            const detailsDiv = document.getElementById(`details-${index}`);
-            const isHidden = detailsDiv.classList.contains('hidden');
-            
-            // Hide all other details
-            document.querySelectorAll('.file-details').forEach(d => {
-              d.classList.add('hidden');
-            });
-            
-            if (isHidden) {
-              detailsDiv.classList.remove('hidden');
-              this.textContent = 'Hide Details';
-              
-              // Show detailed results for this file
-              const result = results[index];
-              let detailsHtml = '<div class="text-xs space-y-2">';
-              
-              if (result.details && result.details.length > 0) {
-                result.details.forEach((detail, idx) => {
-                  detailsHtml += `
-                    <div class="p-2 bg-white dark:bg-gray-800 rounded">
-                      <div class="font-medium">Chunk ${idx + 1} (${(detail.best_similarity * 100).toFixed(2)}%)</div>
-                      <div class="text-gray-600 dark:text-gray-300 truncate">${escapeHtml(detail.chunk_text?.substring(0, 100) || '')}...</div>
-                    </div>
-                  `;
-                });
-              }
-              detailsHtml += '</div>';
-              detailsDiv.innerHTML = detailsHtml;
-            } else {
-              detailsDiv.classList.add('hidden');
-              this.textContent = 'View Details';
-            }
-          });
-        });
-        
-        // Update overall badge
-        const avgScore = results.reduce((sum, r) => sum + r.overall_score, 0) / results.length;
-        overallBadge.textContent = `Batch: ${avgScore.toFixed(2)}% average`;
-        overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${
-          avgScore > 50 ? 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-300' :
-          avgScore > 20 ? 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-300' :
-          'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-300'
-        }`;
+        displayBatchResults(results);
+      } else {
+        alert('No files were processed successfully.');
       }
       
+      // Hide progress after delay
       setTimeout(() => {
         batchProgress.classList.add('hidden');
         batchProgressBar.style.width = '0%';
+        batchFileInput.value = ''; // Reset file input
       }, 2000);
     });
+
+    function displayBatchResults(results) {
+      // Show results panel
+      resultsPanel.classList.remove('hidden');
+      resultsContent.innerHTML = '';
+      
+      // Calculate average score
+      const avgScore = results.reduce((sum, r) => sum + r.overall_score, 0) / results.length;
+      
+      // Update overall badge
+      overallBadge.textContent = `Batch: ${avgScore.toFixed(2)}% average`;
+      overallBadge.className = `text-sm font-semibold px-3 py-1 rounded-lg ${
+        avgScore > 50 ? 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-300' :
+        avgScore > 20 ? 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-300' :
+        'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-300'
+      }`;
+      
+      // Create header
+      const header = document.createElement('div');
+      header.className = 'p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border dark:border-gray-700 mb-4';
+      header.innerHTML = `
+        <div class="flex items-center justify-between">
+          <h4 class="font-semibold">Batch Results (${results.length} files)</h4>
+          <div class="text-sm font-medium ${avgScore > 50 ? 'text-red-600' : avgScore > 20 ? 'text-yellow-600' : 'text-green-600'}">
+            Average: ${avgScore.toFixed(2)}%
+          </div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">
+          Click on any file to view detailed results
+        </div>
+      `;
+      resultsContent.appendChild(header);
+      
+      // Create result cards for each file
+      results.forEach((result, index) => {
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors';
+        card.dataset.index = index;
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="font-medium text-sm truncate max-w-[70%]">${escapeHtml(result.filename)}</div>
+            <div class="text-sm font-semibold ${result.overall_score > 50 ? 'text-red-600' : result.overall_score > 20 ? 'text-yellow-600' : 'text-green-600'}">
+              ${result.overall_score}%
+            </div>
+          </div>
+          <div class="mt-1 text-xs text-gray-500">
+            ${escapeHtml(result.message || '')}
+          </div>
+          <div class="mt-2 flex justify-between text-xs">
+            <span>Chunks: ${result.total_chunks || 0}</span>
+            <span>AI: ${result.ai_analysis?.ai_probability || 0}%</span>
+            <button class="text-purple-accent hover:underline view-details-btn">
+              View Details
+            </button>
+          </div>
+          <div class="file-details hidden mt-3" id="details-${index}"></div>
+        `;
+        
+        // Add click event to view details
+        card.addEventListener('click', function(e) {
+          if (!e.target.classList.contains('view-details-btn')) return;
+          
+          const index = this.dataset.index;
+          const detailsDiv = document.getElementById(`details-${index}`);
+          const isHidden = detailsDiv.classList.contains('hidden');
+          
+          // Hide all other details
+          document.querySelectorAll('.file-details').forEach(d => {
+            d.classList.add('hidden');
+          });
+          
+          if (isHidden) {
+            detailsDiv.classList.remove('hidden');
+            const viewBtn = this.querySelector('.view-details-btn');
+            if (viewBtn) viewBtn.textContent = 'Hide Details';
+            
+            // Show detailed results
+            const result = results[index];
+            let detailsHtml = '<div class="text-xs space-y-2 pt-2 border-t dark:border-gray-700">';
+            
+            if (result.details && result.details.length > 0) {
+              result.details.forEach((detail, idx) => {
+                if (detail.matches && detail.matches.length > 0) {
+                  detailsHtml += `
+                    <div class="p-2 bg-white dark:bg-gray-800 rounded">
+                      <div class="font-medium">Chunk ${idx + 1} (${(detail.best_similarity * 100).toFixed(2)}%)</div>
+                      <div class="text-gray-600 dark:text-gray-300 mt-1 text-xs truncate">${escapeHtml(detail.chunk_text?.substring(0, 150) || '')}${detail.chunk_text?.length > 150 ? '...' : ''}</div>
+                      <div class="mt-1 text-xs text-gray-500">
+                        Matches: ${detail.matches.length}
+                      </div>
+                    </div>
+                  `;
+                }
+              });
+            } else {
+              detailsHtml += '<div class="text-gray-500 text-center py-2">No matches found for this file</div>';
+            }
+            detailsHtml += '</div>';
+            detailsDiv.innerHTML = detailsHtml;
+          } else {
+            detailsDiv.classList.add('hidden');
+            const viewBtn = this.querySelector('.view-details-btn');
+            if (viewBtn) viewBtn.textContent = 'View Details';
+          }
+          
+          e.stopPropagation();
+        });
+        
+        resultsContent.appendChild(card);
+      });
+      
+      // Scroll to results
+      resultsPanel.scrollIntoView({ behavior: 'smooth' });
+    }
 
     /* ====== dropzone ====== */
     dropZone.addEventListener('click', ()=> fileInput.click());
@@ -1210,10 +1262,10 @@
     fetchCorpusCount();
     applyLangUI();
     loadStats(); // Load initial stats
-    initTheme(); // Initialize theme
   </script>
 </body>
 </html>
+
 
 
 
