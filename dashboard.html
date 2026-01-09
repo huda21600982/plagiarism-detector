@@ -30,7 +30,20 @@
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
 
     /* highlight */
-    mark.plag-mark { background: #fde68a; padding: 0 2px; border-radius: 4px; }
+    mark.plag-mark { 
+      background: linear-gradient(120deg, #fde68a80, #fbbf2480);
+      padding: 0 2px;
+      border-radius: 3px;
+      border-left: 2px solid #f59e0b;
+      border-right: 2px solid #f59e0b;
+      transition: all 0.2s ease;
+      cursor: help;
+    }
+    mark.plag-mark:hover {
+      background: linear-gradient(120deg, #fde68a, #fbbf24);
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+      transform: translateY(-1px);
+    }
     .ai-warning { animation: pulse 2s infinite; }
     @keyframes pulse {
       0%, 100% { opacity: 1; }
@@ -991,21 +1004,38 @@
       if (!text) return '';
       if (!spans || !spans.length) return escapeHtml(text);
 
+      // Sort spans by start position
+      const sortedSpans = [...spans].sort((a, b) => a.start - b.start);
+      
       let out = '';
       let last = 0;
 
-      const safeSpans = spans
-        .filter(sp => typeof sp.start === 'number' && typeof sp.end === 'number')
-        .map(sp => ({ start: Math.max(0, Math.min(text.length, sp.start)), end: Math.max(0, Math.min(text.length, sp.end)) }))
-        .filter(sp => sp.end > sp.start)
-        .sort((a,b)=>a.start-b.start);
-
-      for (const sp of safeSpans) {
-        if (sp.start > last) out += escapeHtml(text.slice(last, sp.start));
-        out += `<mark class="plag-mark">${escapeHtml(text.slice(sp.start, sp.end))}</mark>`;
-        last = sp.end;
+      for (const sp of sortedSpans) {
+        const start = parseInt(sp.start);
+        const end = parseInt(sp.end);
+        
+        // Validate span indices
+        if (isNaN(start) || isNaN(end) || start >= end || start < 0 || end > text.length) {
+          continue;
+        }
+        
+        // Add text before highlight
+        if (start > last) {
+          out += escapeHtml(text.slice(last, start));
+        }
+        
+        // Add highlighted text
+        const highlightedText = text.slice(start, end);
+        const similarity = sp.similarity ? `Similarity: ${(sp.similarity * 100).toFixed(1)}%` : 'Matched text';
+        out += `<mark class="plag-mark" title="${similarity}">${escapeHtml(highlightedText)}</mark>`;
+        last = end;
       }
-      if (last < text.length) out += escapeHtml(text.slice(last));
+      
+      // Add remaining text
+      if (last < text.length) {
+        out += escapeHtml(text.slice(last));
+      }
+      
       return out;
     }
 
@@ -1064,6 +1094,7 @@
         const card = document.createElement('div');
         card.className = 'p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900';
 
+        // Use the new highlight renderer
         const chunkHtml = renderWithHighlights(d.chunk_text || '', d.highlights || []);
 
         card.innerHTML = `
@@ -1265,6 +1296,7 @@
   </script>
 </body>
 </html>
+
 
 
 
